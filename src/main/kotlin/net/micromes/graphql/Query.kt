@@ -1,5 +1,5 @@
 package net.micromes.graphql
 
 class Query {
-    fun username(context: Context) = context.user.username
+    fun username(context: Context) = context.user.name
 }
