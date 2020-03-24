@@ -26,15 +26,19 @@ import io.ktor.request.port
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.response.respondText
+import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.routing.get
-import io.ktor.routing.post
+import net.micromes.db.connect
 import net.micromes.entities.User
 import net.micromes.graphql.Context
 import net.micromes.graphql.Mutation
 import net.micromes.graphql.Query
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.transactions.transaction
 
 data class Body(
     val query : String,
@@ -54,6 +58,12 @@ val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
 )
 
 fun main() {
+
+    //mysql
+    connect()
+    transaction {
+        addLogger(StdOutSqlLogger)
+    }
 
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
@@ -75,7 +85,6 @@ fun main() {
             post("/") {
                 val rawBody = call.receive<String>()
                 val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
-                //val reqBody = call.receive<Map<String, String>>()
                 println(reqBody.variables)
                 val execBuilder = ExecutionInput.newExecutionInput()
                     .query(reqBody.query)
@@ -89,7 +98,6 @@ fun main() {
         }
     }.start(true)
 }
-
 
 fun getSchema() : GraphQLSchema {
     val config = SchemaGeneratorConfig(listOf("net.micromes"))
