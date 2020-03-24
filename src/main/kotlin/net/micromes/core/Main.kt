@@ -28,6 +28,8 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
+import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -36,12 +38,22 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.*
 import io.ktor.util.hex
+<<<<<<< HEAD
 import net.micromes.entities.GoogleAccount
+=======
+import net.micromes.db.connect
+>>>>>>> 7b0db601c06a535b8ecbe51f0565fb5ce8c57b65
 import net.micromes.entities.User
 import net.micromes.graphql.Context
 import net.micromes.graphql.Mutation
 import net.micromes.graphql.Query
+<<<<<<< HEAD
 import java.net.URI
+=======
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.transactions.transaction
+>>>>>>> 7b0db601c06a535b8ecbe51f0565fb5ce8c57b65
 
 data class Body(
     val query : String,
@@ -61,6 +73,16 @@ val miciromesgoogleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
 )
 
 fun main() {
+<<<<<<< HEAD
+=======
+
+    //mysql
+    connect()
+    transaction {
+        addLogger(StdOutSqlLogger)
+    }
+
+>>>>>>> 7b0db601c06a535b8ecbe51f0565fb5ce8c57b65
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
         install(Sessions) {
@@ -134,7 +156,6 @@ fun main() {
         }
     }.start(true)
 }
-
 
 fun getSchema() : GraphQLSchema {
     val config = SchemaGeneratorConfig(listOf("net.micromes"))
