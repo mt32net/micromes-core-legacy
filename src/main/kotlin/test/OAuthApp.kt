@@ -1,4 +1,4 @@
-package net.micromes.core
+package test
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -25,13 +25,13 @@ import io.ktor.sessions.*
 import io.ktor.util.hex
 
 //oauth data DO NOT CHANGE
-val mciromesgoogleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
+val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
     name = "google",
     authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
     accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
     requestMethod = HttpMethod.Post,
 
-    clientId = "1025113353398-pb40di8kma99osibf68j8ov8fqvddr96.apps.googleusercontent.com", // @TODO: Remember to change this!
+    clientId = "1025113353398-pb40di8kma99osibf68j8ov8fqvddr96.apps.googleusercontent.com",
     clientSecret = "ZtS_4ANT1xX3SPlNgPIMjNzW",
     defaultScopes = listOf("profile")
 )
@@ -51,17 +51,15 @@ fun main(args: Array<String>) {
             //redirect to google login when typing .../login in the browser
             oauth("google-oauth") {
                 client = HttpClient(Apache)
-                providerLookup = { mciromesgoogleOauthProvider }
-                urlProvider = {
-                    redirectUrl("/login")
-                }
+                providerLookup = { googleOauthProvider }
+                urlProvider = { redirectUrl("/login") }
             }
         }
         routing {
             get("/") {
                 val session = call.sessions.get<MySession>()
                 //get data from cookie and displaying data on site
-                call.respondText("HI ${session?.userId}")
+                call.respondText("${session?.userId}")
             }
             authenticate("google-oauth") {
                 route("/login") {
@@ -76,11 +74,9 @@ fun main(args: Array<String>) {
 
                         //user info json to map
                         val data : Map<String, Any?> = ObjectMapper().readValue(json)
-                        val id = data["id"] as String?
-                        val username = data["name"] as String?
-                        println(data)
 
-                        //save user data im cookie?
+
+                        //save user data in the cookie?
                         if (data != null) {
                             call.sessions.set(MySession(data.toString()))
                         }

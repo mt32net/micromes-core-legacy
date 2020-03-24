@@ -36,10 +36,12 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.*
 import io.ktor.util.hex
+import net.micromes.entities.GoogleAccount
 import net.micromes.entities.User
 import net.micromes.graphql.Context
 import net.micromes.graphql.Mutation
 import net.micromes.graphql.Query
+import java.net.URI
 
 data class Body(
     val query : String,
@@ -47,7 +49,7 @@ data class Body(
     val variables: Map<String, String>
 )
 
-val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
+val miciromesgoogleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
     name = "google",
     authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
     accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
@@ -55,37 +57,42 @@ val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
 
     clientId = "1025113353398-pb40di8kma99osibf68j8ov8fqvddr96.apps.googleusercontent.com",
     clientSecret = "ZtS_4ANT1xX3SPlNgPIMjNzW",
-    defaultScopes = listOf("profile") // no email, but gives full name, picture, and id
+    defaultScopes = listOf("profile")
 )
 
 fun main() {
-
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
+        install(Sessions) {
+            //init cookie?
+            cookie<GoogleAccount>("oauthSampleSessionId") {
+                val secretSignKey = hex("000102030405060708090a0b0c0d0e0f") // @TODO: Remember to change this!
+                transform(SessionTransportTransformerMessageAuthentication(secretSignKey))
+            }
+        }
+        install(ContentNegotiation) {
+            jackson {
+            }
+        }
+        install(Authentication) {
+            //redirect to google login when typing .../login in the browser
+            oauth("google-oauth") {
+                client = HttpClient(Apache)
+                providerLookup = { miciromesgoogleOauthProvider }
+                urlProvider = { redirectUrl("/login") }
+            }
+        }
         routing {
-            install(Sessions) {
-                cookie<MySession>("oauthSampleSessionId") {
-                    val secretSignKey = hex("000102030405060708090a0b0c0d0e0f") // @TODO: Remember to change this!
-                    transform(SessionTransportTransformerMessageAuthentication(secretSignKey))
-                }
-            }
-            install(ContentNegotiation) {
-                jackson {
-                }
-            }
-            install(Authentication) {
-                oauth("google-oauth") {
-                    client = HttpClient(Apache)
-                    providerLookup = { googleOauthProvider }
-                    urlProvider = { redirectUrl("/login") }
-                }
-            }
             get("/") {
-                call.respondText { "Hallo!" }
+                val session = call.sessions.get<GoogleAccount>()
+                //get data from cookie and displaying data on site
+                call.respondText { "Hallo ${session?.name}" }
             }
             post("/") {
                 val rawBody = call.receive<String>()
-                val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
+                val reqBody: Body =
+                    jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+                        .readValue(rawBody)
                 //val reqBody = call.receive<Map<String, String>>()
                 println(reqBody.variables)
                 val execBuilder = ExecutionInput.newExecutionInput()
@@ -103,18 +110,23 @@ fun main() {
                         val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
                             ?: error("No principal")
 
+                        //get user info
                         val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
                             header("Authorization", "Bearer ${principal.accessToken}")
                         }
 
-                        val data : Map<String, Any?> = ObjectMapper().readValue(json)
+                        //user info json to map
+                        val data: Map<String, Any?> = ObjectMapper().readValue(json)
                         val id = data["id"] as String?
-                        val username = data["username"] as String?
-                        println(data)
+                        val name = data["name"] as String?
+                        val pictureLink = data["picture"] as String?
+                        val locale = data["locale"] as String?
 
-                        if (username != null) {
-                            call.sessions.set(MySession(username))
+                        //save user data in the cookie?
+                        if (id != null && name != null && pictureLink != null && locale != null) {
+                            call.sessions.set(GoogleAccount(id, name, pictureLink, locale))
                         }
+                        println(data.toString())
                         call.respondRedirect("/")
                     }
                 }
