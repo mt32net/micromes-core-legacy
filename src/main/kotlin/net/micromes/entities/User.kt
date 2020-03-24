@@ -8,7 +8,7 @@ import java.util.*
 
 data class User(
     val uuid: UUID = UUID.randomUUID(),
-    val username: String,
+    val name: String,
     val profilePictureLocation: URI = Settings.DEFAULT_LOGO_URL,
     val status: Status = Status.OFFLINE,
     val privateChannels: List<PrivateChannel> = listOf(),

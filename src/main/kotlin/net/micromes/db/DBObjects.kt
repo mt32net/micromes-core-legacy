@@ -1,14 +1,27 @@
 package net.micromes.db
 
+import net.micromes.entities.channels.MessageChannel
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
+import kotlin.concurrent.timer
 
 class DBObjects {
     companion object {
-        object StarWarsFilms : UUIDTable() {
-            val sequelId = integer("sequel__id").uniqueIndex()
+        object Users : UUIDTable() {
             val name = varchar("name", 50)
-            val director = varchar("director", 50)
+            val profilePictureLocation = varchar("profilePictureLocation", 255)
+        }
+        object UserByMChannels : IntIdTable() {
+            val user = reference("users", Users)
+            val pMChannel = reference("messagechannels", MessageChannels)
+        }
+        object MessageChannels : UUIDTable() {
+            val name = varchar("name", 20)
+        }
+        object Messages : UUIDTable() {
+            val content = varchar("content", 255)
+            val auhtor = reference("users", Users)
+            val channel = reference("messagechannels", MessageChannels)
         }
     }
 }
