@@ -10,6 +10,9 @@ import graphql.ExecutionInput
 import graphql.GraphQL
 import graphql.schema.GraphQLSchema
 import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.features.ContentNegotiation
+import io.ktor.jackson.jackson
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.response.respondText
@@ -29,6 +32,10 @@ fun main() {
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
         routing {
+            install(ContentNegotiation) {
+                jackson {
+                }
+            }
             get("/") {
                 call.respondText { "Hallo!" }
             }
@@ -52,7 +59,7 @@ fun main() {
 
 
 fun getSchema() : GraphQLSchema {
-    val config = SchemaGeneratorConfig(listOf("de.mtorials"))
+    val config = SchemaGeneratorConfig(listOf("net.micromes"))
     return toSchema(
         config = config,
         queries = listOf(TopLevelObject(Query())),
