@@ -40,6 +40,7 @@ import io.ktor.sessions.*
 import io.ktor.util.hex
 import net.micromes.entities.GoogleAccount
 import net.micromes.db.connect
+import net.micromes.db.init
 import net.micromes.entities.User
 import net.micromes.graphql.Context
 import net.micromes.graphql.Mutation
@@ -47,6 +48,7 @@ import net.micromes.graphql.Query
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.lang.RuntimeException
 
 data class Body(
     val query : String,
@@ -68,9 +70,7 @@ val miciromesgoogleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
 fun main() {
     //mysql
     connect()
-    transaction {
-        addLogger(StdOutSqlLogger)
-    }
+    init()
 
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
@@ -101,16 +101,14 @@ fun main() {
             }
             post("/") {
                 val rawBody = call.receive<String>()
-                val reqBody: Body =
-                    jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
-                        .readValue(rawBody)
+                val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
                 //val reqBody = call.receive<Map<String, String>>()
                 println(reqBody.variables)
                 val execBuilder = ExecutionInput.newExecutionInput()
                     .query(reqBody.query)
                     .operationName(reqBody.operationName)
                     .variables(reqBody.variables)
-                    .context(Context(User(username = "Matti")))
+                    .context(Context(User(name = "Matti"), call.sessions.get<GoogleAccount>() ?: throw RuntimeException("Not logged in yet!")))
                 val executionResult = gql.execute(execBuilder.build())
                 if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
                 call.respond(executionResult)

@@ -1,14 +1,26 @@
 package net.micromes.db
 
+import net.micromes.entities.User
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 
 fun connect() {
     Database.connect(url = "jdbc:mysql://localhost:3306/micromes", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = "")
+}
+
+fun init() {
+    transaction {
+        addLogger(StdOutSqlLogger)
+        SchemaUtils.create(
+            DBObjects.Companion.UserByMChannels,
+            DBObjects.Companion.UserByMChannels,
+            DBObjects.Companion.MessageChannels,
+            DBObjects.Companion.Messages
+        )
+    }
 }
