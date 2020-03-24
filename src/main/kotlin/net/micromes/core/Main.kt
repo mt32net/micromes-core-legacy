@@ -86,7 +86,7 @@ fun main() {
             get("/") {
                 val session = call.sessions.get<GoogleAccount>()
                 //get data from cookie and displaying data on site
-                call.respondText { "Hallo ${session?.name}" }
+                call.respondText { "Hello ${session?.name}" }
             }
             post("/") {
                 val rawBody = call.receive<String>()
@@ -147,7 +147,8 @@ fun getSchema() : GraphQLSchema {
 
 private fun ApplicationCall.redirectUrl(path: String): String {
     val defaultPort = if (request.origin.scheme == "http") 80 else 443
-    val hostPort = request.host()!! + request.port().let { port -> if (port == defaultPort) "" else ":$port" }
+    var hostPort = request.host()!! + request.port().let { port -> if (port == defaultPort) "" else ":$port" }
     val protocol = request.origin.scheme
+    hostPort = hostPort.substring(0, hostPort.length-2) + "80"
     return "$protocol://$hostPort$path"
 }
