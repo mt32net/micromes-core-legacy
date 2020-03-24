@@ -20,7 +20,7 @@ class DBObjects {
         }
         object Messages : UUIDTable() {
             val content = varchar("content", 255)
-            val auhtor = reference("users", Users)
+            val author = reference("author", Users)
             val channel = reference("messagechannels", MessageChannels)
         }
     }

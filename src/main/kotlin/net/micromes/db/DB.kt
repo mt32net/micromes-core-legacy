@@ -1,5 +1,6 @@
 package net.micromes.db
 
+import net.micromes.entities.User
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -15,5 +16,11 @@ fun connect() {
 fun init() {
     transaction {
         addLogger(StdOutSqlLogger)
+        SchemaUtils.create(
+            DBObjects.Companion.UserByMChannels,
+            DBObjects.Companion.UserByMChannels,
+            DBObjects.Companion.MessageChannels,
+            DBObjects.Companion.Messages
+        )
     }
 }

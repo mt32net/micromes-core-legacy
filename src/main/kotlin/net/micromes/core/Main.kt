@@ -48,6 +48,7 @@ import net.micromes.graphql.Query
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.lang.RuntimeException
 
 data class Body(
     val query : String,
@@ -107,7 +108,7 @@ fun main() {
                     .query(reqBody.query)
                     .operationName(reqBody.operationName)
                     .variables(reqBody.variables)
-                    .context(Context(User(name = "Matti")))
+                    .context(Context(User(name = "Matti"), call.sessions.get<GoogleAccount>() ?: throw RuntimeException("Not logged in yet!")))
                 val executionResult = gql.execute(execBuilder.build())
                 if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
                 call.respond(executionResult)
