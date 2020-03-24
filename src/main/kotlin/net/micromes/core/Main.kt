@@ -4,6 +4,7 @@ import com.expediagroup.graphql.SchemaGeneratorConfig
 import com.expediagroup.graphql.TopLevelObject
 import com.expediagroup.graphql.toSchema
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionInput
@@ -12,11 +13,11 @@ import graphql.schema.GraphQLSchema
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
-import io.ktor.auth.Authentication
-import io.ktor.auth.OAuthServerSettings
-import io.ktor.auth.oauth
+import io.ktor.auth.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
+import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.origin
 import io.ktor.http.HttpMethod
@@ -25,12 +26,18 @@ import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.request.receive
 import io.ktor.response.respond
+import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.routing.get
+import io.ktor.routing.post
+import io.ktor.routing.route
+import io.ktor.sessions.*
+import io.ktor.util.hex
 import net.micromes.db.connect
 import net.micromes.entities.User
 import net.micromes.graphql.Context
@@ -68,6 +75,12 @@ fun main() {
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
         routing {
+            install(Sessions) {
+                cookie<MySession>("oauthSampleSessionId") {
+                    val secretSignKey = hex("000102030405060708090a0b0c0d0e0f") // @TODO: Remember to change this!
+                    transform(SessionTransportTransformerMessageAuthentication(secretSignKey))
+                }
+            }
             install(ContentNegotiation) {
                 jackson {
                 }
@@ -85,6 +98,7 @@ fun main() {
             post("/") {
                 val rawBody = call.receive<String>()
                 val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
+                //val reqBody = call.receive<Map<String, String>>()
                 println(reqBody.variables)
                 val execBuilder = ExecutionInput.newExecutionInput()
                     .query(reqBody.query)
@@ -94,6 +108,28 @@ fun main() {
                 val executionResult = gql.execute(execBuilder.build())
                 if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
                 call.respond(executionResult)
+            }
+            authenticate("google-oauth") {
+                route("/login") {
+                    handle {
+                        val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
+                            ?: error("No principal")
+
+                        val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
+                            header("Authorization", "Bearer ${principal.accessToken}")
+                        }
+
+                        val data : Map<String, Any?> = ObjectMapper().readValue(json)
+                        val id = data["id"] as String?
+                        val username = data["username"] as String?
+                        println(data)
+
+                        if (username != null) {
+                            call.sessions.set(MySession(username))
+                        }
+                        call.respondRedirect("/")
+                    }
+                }
             }
         }
     }.start(true)
