@@ -21,6 +21,10 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.routing.get
 import io.ktor.routing.post
+import net.micromes.entities.User
+import net.micromes.graphql.Context
+import net.micromes.graphql.Mutation
+import net.micromes.graphql.Query
 
 data class Body(
     val query : String,
@@ -48,7 +52,7 @@ fun main() {
                     .query(reqBody.query)
                     .operationName(reqBody.operationName)
                     .variables(reqBody.variables)
-                    .context("Hallo")
+                    .context(Context(User(username = "Matti")))
                 val executionResult = gql.execute(execBuilder.build())
                 if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
                 call.respond(executionResult)
