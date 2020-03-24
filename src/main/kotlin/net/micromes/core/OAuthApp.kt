@@ -24,6 +24,7 @@ import io.ktor.server.netty.Netty
 import io.ktor.sessions.*
 import io.ktor.util.hex
 
+//oauth data DO NOT CHANGE
 val mciromesgoogleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
     name = "google",
     authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
@@ -31,8 +32,8 @@ val mciromesgoogleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
     requestMethod = HttpMethod.Post,
 
     clientId = "1025113353398-pb40di8kma99osibf68j8ov8fqvddr96.apps.googleusercontent.com", // @TODO: Remember to change this!
-    clientSecret = "ZtS_4ANT1xX3SPlNgPIMjNzW", // @TODO: Remember to change this!
-    defaultScopes = listOf("profile") // no email, but gives full name, picture, and id
+    clientSecret = "ZtS_4ANT1xX3SPlNgPIMjNzW",
+    defaultScopes = listOf("profile")
 )
 
 class MySession(val userId: String)
@@ -40,12 +41,14 @@ class MySession(val userId: String)
 fun main(args: Array<String>) {
     embeddedServer(Netty, port = 8090) {
         install(Sessions) {
+            //init cookie?
             cookie<MySession>("oauthSampleSessionId") {
                 val secretSignKey = hex("000102030405060708090a0b0c0d0e0f") // @TODO: Remember to change this!
                 transform(SessionTransportTransformerMessageAuthentication(secretSignKey))
             }
         }
         install(Authentication) {
+            //redirect to google login when typing .../login in the browser
             oauth("google-oauth") {
                 client = HttpClient(Apache)
                 providerLookup = { mciromesgoogleOauthProvider }
@@ -57,6 +60,7 @@ fun main(args: Array<String>) {
         routing {
             get("/") {
                 val session = call.sessions.get<MySession>()
+                //get data from cookie and displaying data on site
                 call.respondText("HI ${session?.userId}")
             }
             authenticate("google-oauth") {
@@ -65,16 +69,22 @@ fun main(args: Array<String>) {
                         val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
                             ?: error("No principal")
 
+                        //get user info
                         val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
                             header("Authorization", "Bearer ${principal.accessToken}")
                         }
 
+                        //user info json to map
                         val data : Map<String, Any?> = ObjectMapper().readValue(json)
                         val id = data["id"] as String?
+                        val username = data["name"] as String?
+                        println(data)
 
-                        if (id != null) {
-                            call.sessions.set(MySession(id))
+                        //save user data im cookie?
+                        if (data != null) {
+                            call.sessions.set(MySession(data.toString()))
                         }
+                        //redirect user to home
                         call.respondRedirect("/")
                     }
                 }
