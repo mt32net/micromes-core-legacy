@@ -137,7 +137,6 @@ fun main() {
                         if (id != null && name != null && pictureLink != null && locale != null) {
                             call.sessions.set(GoogleAccount(id, name, pictureLink, locale))
                         }
-                        println(data.toString())
                         call.respondRedirect("/")
                     }
                 }
@@ -159,6 +158,6 @@ private fun ApplicationCall.redirectUrl(path: String): String {
     val defaultPort = if (request.origin.scheme == "http") 80 else 443
     var hostPort = request.host()!! + request.port().let { port -> if (port == defaultPort) "" else ":$port" }
     val protocol = request.origin.scheme
-    hostPort = hostPort.substring(0, hostPort.length-2) + "80"
+    hostPort = hostPort.substring(0, hostPort.length-2) + "90"
     return "$protocol://$hostPort$path"
 }
