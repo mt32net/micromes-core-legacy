@@ -16,6 +16,7 @@ import io.ktor.auth.Authentication
 import io.ktor.auth.OAuthServerSettings
 import io.ktor.auth.oauth
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.apache.Apache
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.origin
 import io.ktor.http.HttpMethod
@@ -41,17 +42,18 @@ data class Body(
     val variables: Map<String, String>
 )
 
-fun main() {
-    val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
-        name = "google",
-        authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
-        accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
-        requestMethod = HttpMethod.Post,
+val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
+    name = "google",
+    authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
+    accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
+    requestMethod = HttpMethod.Post,
 
-        clientId = "1025113353398-pb40di8kma99osibf68j8ov8fqvddr96.apps.googleusercontent.com",
-        clientSecret = "ZtS_4ANT1xX3SPlNgPIMjNzW",
-        defaultScopes = listOf("profile") // no email, but gives full name, picture, and id
-    );
+    clientId = "1025113353398-pb40di8kma99osibf68j8ov8fqvddr96.apps.googleusercontent.com",
+    clientSecret = "ZtS_4ANT1xX3SPlNgPIMjNzW",
+    defaultScopes = listOf("profile") // no email, but gives full name, picture, and id
+)
+
+fun main() {
 
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
