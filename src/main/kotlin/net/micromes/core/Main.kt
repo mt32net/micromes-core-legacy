@@ -38,22 +38,15 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.sessions.*
 import io.ktor.util.hex
-<<<<<<< HEAD
 import net.micromes.entities.GoogleAccount
-=======
 import net.micromes.db.connect
->>>>>>> 7b0db601c06a535b8ecbe51f0565fb5ce8c57b65
 import net.micromes.entities.User
 import net.micromes.graphql.Context
 import net.micromes.graphql.Mutation
 import net.micromes.graphql.Query
-<<<<<<< HEAD
-import java.net.URI
-=======
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
->>>>>>> 7b0db601c06a535b8ecbe51f0565fb5ce8c57b65
 
 data class Body(
     val query : String,
@@ -73,21 +66,17 @@ val miciromesgoogleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
 )
 
 fun main() {
-<<<<<<< HEAD
-=======
-
     //mysql
     connect()
     transaction {
         addLogger(StdOutSqlLogger)
     }
 
->>>>>>> 7b0db601c06a535b8ecbe51f0565fb5ce8c57b65
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
         install(Sessions) {
             //init cookie?
-            cookie<GoogleAccount>("oauthSampleSessionId") {
+            cookie<GoogleAccount>("oauth") {
                 val secretSignKey = hex("000102030405060708090a0b0c0d0e0f") // @TODO: Remember to change this!
                 transform(SessionTransportTransformerMessageAuthentication(secretSignKey))
             }
