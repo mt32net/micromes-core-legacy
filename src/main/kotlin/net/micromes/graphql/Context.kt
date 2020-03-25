@@ -5,6 +5,14 @@ import net.micromes.entities.GoogleAccount
 import net.micromes.entities.User
 
 data class Context(
-    val user: User,
     val googleAccount: GoogleAccount
-): GraphQLContext
+): GraphQLContext {
+
+    private var user : User
+
+    init {
+        user = User(name = "Matti")
+    }
+
+    fun getUser() = user
+}

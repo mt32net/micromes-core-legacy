@@ -30,25 +30,18 @@ import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.post
+import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.route
 import io.ktor.sessions.*
 import io.ktor.util.hex
-import net.micromes.entities.GoogleAccount
 import net.micromes.db.dBConnect
 import net.micromes.db.dBInit
-import net.micromes.entities.User
+import net.micromes.entities.GoogleAccount
 import net.micromes.graphql.Context
 import net.micromes.graphql.Mutation
 import net.micromes.graphql.Query
-import org.jetbrains.exposed.sql.StdOutSqlLogger
-import org.jetbrains.exposed.sql.addLogger
-import org.jetbrains.exposed.sql.transactions.transaction
-import java.lang.RuntimeException
 
 data class Body(
     val query : String,
@@ -108,7 +101,7 @@ fun main() {
                     .query(reqBody.query)
                     .operationName(reqBody.operationName)
                     .variables(reqBody.variables)
-                    .context(Context(User(name = "Matti"), call.sessions.get<GoogleAccount>() ?: throw RuntimeException("Not logged in yet!")))
+                    .context(Context(call.sessions.get<GoogleAccount>() ?: throw RuntimeException("Not logged in yet!")))
                 val executionResult = gql.execute(execBuilder.build())
                 if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
                 call.respond(executionResult)
