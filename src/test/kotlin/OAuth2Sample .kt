@@ -1,4 +1,4 @@
-package test/*
+/*
  * Copyright (c) 2010 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -87,7 +87,10 @@ object OAuth2Sample {
         }
         // set up authorization code flow
         val flow = GoogleAuthorizationCodeFlow.Builder(
-            httpTransport, JSON_FACTORY, clientSecrets, SCOPES
+            httpTransport,
+            JSON_FACTORY,
+            clientSecrets,
+            SCOPES
         ).setDataStoreFactory(
             dataStoreFactory
         ).build()
@@ -104,7 +107,9 @@ object OAuth2Sample {
             val credential = authorize()
             // set up global Oauth2 instance
             oauth2 =
-                Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(
+                Builder(
+                    httpTransport,
+                    JSON_FACTORY, credential).setApplicationName(
                     APPLICATION_NAME
                 ).build()
             // run commands
