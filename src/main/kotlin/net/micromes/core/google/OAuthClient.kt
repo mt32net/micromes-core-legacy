@@ -23,7 +23,7 @@ class OAuthClient{
             .build()
     }
 
-    fun authentificate(idTokenString: String): GoogleAccount {
+    fun authenticate(idTokenString: String): GoogleAccount {
         val idToken: GoogleIdToken? = verifier.verify(idTokenString)
         if (idToken != null) {
             val payload: GoogleIdToken.Payload = idToken.payload
@@ -34,19 +34,17 @@ class OAuthClient{
 
             // Get profile information from payload
             val email: String = payload.email
-            val emailVerified: Boolean = java.lang.Boolean.valueOf(payload.emailVerified)
+            val emailVerified: Boolean = payload.emailVerified
             val name = payload["name"] as String
             val pictureUrl = payload["picture"] as String
             val locale = payload["locale"] as String
-            val familyName = payload["family_name"] as String
             val givenName = payload["given_name"] as String
 
-            return GoogleAccount(idToken.toString(), email, emailVerified,
-                name, pictureUrl, locale, familyName, givenName)
+            return GoogleAccount(userId, email, emailVerified,
+                name, pictureUrl, locale, givenName)
         } else {
             println("Invalid ID token.")
-            return GoogleAccount("", "", false, "",
-                "","","","")
+            throw RuntimeException("Google id_token invalid: $idTokenString")
         }
     }
 }

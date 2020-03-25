@@ -7,6 +7,5 @@ data class GoogleAccount (
     val name: String,
     val pictureURl: String,
     val locale: String,
-    val familyName: String,
     val givenName: String
 )
