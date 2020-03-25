@@ -11,14 +11,13 @@ import net.micromes.core.entities.GoogleAccount
 import java.util.*
 
 class OAuthClient{
-    lateinit var transport: HttpTransport
+    var transport: HttpTransport = GoogleNetHttpTransport.newTrustedTransport()
     var jsonFactory: JsonFactory = JacksonFactory.getDefaultInstance()
     val clientId = Settings.clientId
     val clientSecret = Settings.clientSecret
-    lateinit var verifier: GoogleIdTokenVerifier
+    private var verifier: GoogleIdTokenVerifier
 
     init{
-        transport = GoogleNetHttpTransport.newTrustedTransport()
         verifier = GoogleIdTokenVerifier.Builder(transport, jsonFactory)
             .setAudience(Collections.singletonList((clientId)))
             .build()
