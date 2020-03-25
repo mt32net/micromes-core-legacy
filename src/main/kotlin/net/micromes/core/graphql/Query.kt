@@ -12,6 +12,7 @@ class Query {
     fun username(context: Context) : String = context.getUser().getName()
 
     fun privateChannels(context: Context) : List<PrivateChannel> = context.getUser().getPrivateChannels()
+    fun profilePictureLocation(context: Context) : String = context.getUser().getProfilePictureURIAsString()
 
     fun messagesForChannel(context: Context, privateChannelUUID: String) : Array<Message> {
         val privateChannel = context.getUser().getPrivateChannels().filter { privateChannel -> privateChannel.getUUIDString() == privateChannelUUID }[0]

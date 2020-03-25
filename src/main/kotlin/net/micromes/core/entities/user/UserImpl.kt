@@ -27,10 +27,10 @@ data class UserImpl(
     @GraphQLIgnore
     override fun getProfilePictureLocation(): URI = profilePictureLocation
 
-    @GraphQLName("privateChannels")
+    @GraphQLIgnore
     override fun getPrivateChannels(): List<PrivateChannel> = privateChannels
 
-    @GraphQLName("publicChannels")
+    @GraphQLIgnore
     override fun getPublicChannels(): List<PublicChannel> = publicChannels
 
 }

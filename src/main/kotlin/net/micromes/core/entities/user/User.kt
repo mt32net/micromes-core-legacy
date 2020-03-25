@@ -21,9 +21,9 @@ interface User : Entity {
     @GraphQLName("profilePictureLocation")
     fun getProfilePictureURIAsString() : String = getProfilePictureLocation().toASCIIString()
 
-    @GraphQLName("privateChannels")
+    @GraphQLIgnore
     fun getPrivateChannels() : List<PrivateChannel>
 
-    @GraphQLName("publicChannels")
+    @GraphQLIgnore
     fun getPublicChannels() : List<PublicChannel>
 }
