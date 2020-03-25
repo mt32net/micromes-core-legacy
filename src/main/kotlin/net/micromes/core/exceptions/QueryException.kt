@@ -1,4 +1,4 @@
-package net.micromes.exceptions
+package net.micromes.core.exceptions
 
 abstract class QueryException(
     private val msg : String,

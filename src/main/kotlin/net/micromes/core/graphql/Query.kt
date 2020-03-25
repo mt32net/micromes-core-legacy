@@ -1,10 +1,10 @@
 package net.micromes.core.graphql
 
-import net.micromes.entities.Message
-import net.micromes.entities.channels.MessageChannel
-import net.micromes.entities.channels.PrivateChannel
-import net.micromes.entities.channels.PrivateMessageChannelImpl
-import net.micromes.exceptions.WrongChannelTypeException
+
+import net.micromes.core.entities.Message
+import net.micromes.core.entities.channels.MessageChannel
+import net.micromes.core.entities.channels.PrivateChannel
+import net.micromes.core.exceptions.WrongChannelTypeException
 
 class Query {
 
