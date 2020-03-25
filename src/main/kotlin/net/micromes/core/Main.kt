@@ -62,7 +62,7 @@ fun main() {
                     .query(reqBody.query)
                     .operationName(reqBody.operationName)
                     .variables(reqBody.variables)
-                    .context(Context(call.sessions.get<GoogleAccount>() ?: throw RuntimeException("Not logged in yet!")))
+                    .context(Context())
                 val executionResult = gql.execute(execBuilder.build())
                 if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
                 call.respond(executionResult)

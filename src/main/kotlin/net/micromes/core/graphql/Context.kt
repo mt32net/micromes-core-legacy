@@ -1,18 +1,10 @@
 package net.micromes.core.graphql
 
 import com.expediagroup.graphql.execution.GraphQLContext
-import net.micromes.core.entities.GoogleAccount
-import net.micromes.core.entities.user.User
+import net.micromes.core.entities.user.UserImpl
 
 data class Context(
-    val googleAccount: GoogleAccount
+    private var user : UserImpl = UserImpl(name = "Matti")
 ): GraphQLContext {
-
-    private var user : User
-
-    init {
-        user = User(name = "Matti")
-    }
-
     fun getUser() = user
 }

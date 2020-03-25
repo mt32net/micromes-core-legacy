@@ -1,29 +1,29 @@
-package net.micromes.core.entities.channels
-
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
-import net.micromes.core.entities.Entity
 import net.micromes.core.entities.EntityImpl
+import net.micromes.core.entities.channels.MessageChannel
+import net.micromes.core.entities.channels.PrivateChannel
 import net.micromes.core.entities.message.Message
-import net.micromes.core.entities.user.User
+import net.micromes.core.entities.user.UserImpl
 import java.util.*
 
 class PrivateMessageChannelImpl(
 
     private val uuid: UUID,
     private var name: String,
-    private val users: MutableList<User>,
+    private val users: MutableList<UserImpl>,
     private val messages : MutableList<Message>
 
-): PrivateChannel, MessageChannel, EntityImpl(uuid) {
+): PrivateChannel,
+    MessageChannel, EntityImpl(uuid) {
 
     @GraphQLName("users")
-    override fun getUsers(): Array<User> {
+    override fun getUsers(): Array<UserImpl> {
         return users.toTypedArray()
     }
 
     @GraphQLIgnore
-    override fun addUser(user: User) {
+    override fun addUser(user: UserImpl) {
         users.add(user)
     }
 

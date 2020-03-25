@@ -9,15 +9,13 @@ import net.micromes.core.exceptions.WrongChannelTypeException
 
 class Query {
 
-    fun username(context: Context) : String = context.getUser().name
-    fun googleName(context: Context) : String = context.googleAccount.name
+    fun username(context: Context) : String = context.getUser().getName()
 
-    //fun privateChannels(context: Context) : List<PrivateChannel> = context.getUser().privateChannels
+    fun privateChannels(context: Context) : List<PrivateChannel> = context.getUser().getPrivateChannels()
 
+    fun messagesForChannel(context: Context, privateChannelUUID: String) : Array<Message> {
+        val privateChannel = context.getUser().getPrivateChannels().filter { privateChannel -> privateChannel.getUUIDString() == privateChannelUUID }[0]
+        if (privateChannel is MessageChannel) return privateChannel.getMessages()
+        throw WrongChannelTypeException("Not a message channel")
+    }
 }
-
-//fun messagesForChannel(context: Context, privateChannelUUID: String) : Array<Message> {
-    //val privateChannel = context.getUser().privateChannels.filter { privateChannel -> privateChannel.getUUIDString() == privateChannelUUID }[0]
-    //if (privateChannel is MessageChannel) return privateChannel.getMessages()
-    //throw WrongChannelTypeException("Not a message channel")
-//}
