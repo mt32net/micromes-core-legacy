@@ -1,9 +1,7 @@
 package net.micromes.db
 
-import net.micromes.entities.channels.MessageChannel
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
-import kotlin.concurrent.timer
 
 class DBObjects {
     companion object {
@@ -13,7 +11,7 @@ class DBObjects {
         }
         object UserByMChannels : IntIdTable() {
             val user = reference("users", Users)
-            val pMChannel = reference("messagechannels", MessageChannels)
+            val mChannel = reference("messagechannels", MessageChannels)
         }
         object MessageChannels : UUIDTable() {
             val name = varchar("name", 20)

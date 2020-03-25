@@ -39,8 +39,8 @@ import io.ktor.routing.route
 import io.ktor.sessions.*
 import io.ktor.util.hex
 import net.micromes.entities.GoogleAccount
-import net.micromes.db.connect
-import net.micromes.db.init
+import net.micromes.db.dBConnect
+import net.micromes.db.dBInit
 import net.micromes.entities.User
 import net.micromes.graphql.Context
 import net.micromes.graphql.Mutation
@@ -69,8 +69,8 @@ val miciromesgoogleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
 
 fun main() {
     //mysql
-    connect()
-    init()
+    dBConnect()
+    dBInit()
 
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
