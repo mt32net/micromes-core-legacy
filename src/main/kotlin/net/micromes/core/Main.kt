@@ -36,7 +36,7 @@ data class Body(
     val variables: Map<String, String>
 )
 
-var googleOAuth:OAuthClient = OAuthClient()
+var googleOAuth: OAuthClient = OAuthClient()
 
 fun main() {
     //mysql
