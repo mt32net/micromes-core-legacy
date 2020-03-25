@@ -11,10 +11,10 @@ fun dBInit() {
     transaction {
         addLogger(StdOutSqlLogger)
         SchemaUtils.create(
-            DBObjects.Companion.UserByMChannels,
-            DBObjects.Companion.UserByMChannels,
+            DBObjects.Companion.UsersByChannels,
             DBObjects.Companion.MessageChannels,
-            DBObjects.Companion.Messages
+            DBObjects.Companion.Messages,
+            DBObjects.Companion.UserIDsByGoogleIDs
         )
     }
 }
