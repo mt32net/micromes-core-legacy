@@ -1,4 +1,4 @@
-package net.micromes.db
+package net.micromes.core.db
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction

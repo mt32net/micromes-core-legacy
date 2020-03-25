@@ -1,4 +1,4 @@
-package net.micromes.db
+package net.micromes.core.db
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.UUIDTable

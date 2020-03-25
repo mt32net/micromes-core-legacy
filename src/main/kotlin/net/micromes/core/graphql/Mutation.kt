@@ -1,4 +1,4 @@
-package net.micromes.graphql
+package net.micromes.core.graphql
 
 class Mutation {
     fun changeThis() : Boolean {

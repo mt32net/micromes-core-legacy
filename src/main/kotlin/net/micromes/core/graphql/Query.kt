@@ -1,4 +1,4 @@
-package net.micromes.graphql
+package net.micromes.core.graphql
 
 class Query {
     fun username(context: Context) = context.getUser().name

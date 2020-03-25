@@ -1,7 +1,6 @@
-package net.micromes.config
+package net.micromes.core.config
 
 import java.net.URI
-import java.net.URL
 
 class Settings {
     companion object {

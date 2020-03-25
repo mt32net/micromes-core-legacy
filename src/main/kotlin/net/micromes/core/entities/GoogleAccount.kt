@@ -1,4 +1,4 @@
-package net.micromes.entities
+package net.micromes.core.entities
 
 data class GoogleAccount (
     val id: String,

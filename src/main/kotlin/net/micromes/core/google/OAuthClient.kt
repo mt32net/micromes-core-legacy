@@ -1,21 +1,13 @@
-package net.micromes.google
+package net.micromes.core.google
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpTransport
-import com.google.api.client.http.LowLevelHttpRequest
 import com.google.api.client.json.JsonFactory
-import com.google.api.client.json.JsonGenerator
-import com.google.api.client.json.JsonParser
 import com.google.api.client.json.jackson2.JacksonFactory
-import net.micromes.config.Settings
-import net.micromes.entities.GoogleAccount
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.Reader
-import java.io.Writer
-import java.nio.charset.Charset
+import net.micromes.core.config.Settings
+import net.micromes.core.entities.GoogleAccount
 import java.util.*
 
 class OAuthClient{
