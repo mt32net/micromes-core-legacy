@@ -1,8 +1,11 @@
 package net.micromes.core.entities.channels
 
+import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
-import net.micromes.core.entities.Message
-import net.micromes.core.entities.User
+import net.micromes.core.entities.Entity
+import net.micromes.core.entities.EntityImpl
+import net.micromes.core.entities.message.Message
+import net.micromes.core.entities.user.User
 import java.util.*
 
 class PrivateMessageChannelImpl(
@@ -12,13 +15,14 @@ class PrivateMessageChannelImpl(
     private val users: MutableList<User>,
     private val messages : MutableList<Message>
 
-): PrivateChannel, MessageChannel {
+): PrivateChannel, MessageChannel, EntityImpl(uuid) {
 
     @GraphQLName("users")
     override fun getUsers(): Array<User> {
         return users.toTypedArray()
     }
 
+    @GraphQLIgnore
     override fun addUser(user: User) {
         users.add(user)
     }
@@ -28,13 +32,9 @@ class PrivateMessageChannelImpl(
         return messages.toTypedArray()
     }
 
+    @GraphQLIgnore
     override fun sendMessage(message: Message) {
         this.messages.add(message)
-    }
-
-    @GraphQLName("uuid")
-    override fun getUUID(): UUID {
-        return uuid
     }
 
     @GraphQLName("name")
@@ -42,6 +42,7 @@ class PrivateMessageChannelImpl(
         return name
     }
 
+    @GraphQLIgnore
     override fun setName(name: String) {
         this.name = name
     }

@@ -1,9 +1,9 @@
 package net.micromes.core.entities.channels
 
-import java.util.*
+import net.micromes.core.entities.Entity
 
-interface Channel {
-    fun getUUID(): UUID
+interface Channel : Entity{
+
     fun getName(): String
 
     fun setName(name: String)

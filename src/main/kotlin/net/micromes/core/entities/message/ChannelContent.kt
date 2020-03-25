@@ -1,3 +1,3 @@
-package net.micromes.core.entities
+package net.micromes.core.entities.message
 
 data class ChannelContent(val content : String)
