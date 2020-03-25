@@ -1,8 +1,8 @@
-package net.micromes.entities.channels
+package net.micromes.core.entities.channels
 
 import com.expediagroup.graphql.annotations.GraphQLName
-import net.micromes.entities.Message
-import net.micromes.entities.User
+import net.micromes.core.entities.Message
+import net.micromes.core.entities.User
 import java.util.*
 
 class PrivateMessageChannelImpl(

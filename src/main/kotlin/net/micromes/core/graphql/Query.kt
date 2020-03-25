@@ -1,4 +1,4 @@
-package net.micromes.graphql
+package net.micromes.core.graphql
 
 import net.micromes.entities.Message
 import net.micromes.entities.channels.MessageChannel

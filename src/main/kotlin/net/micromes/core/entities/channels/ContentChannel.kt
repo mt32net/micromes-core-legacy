@@ -1,6 +1,6 @@
-package net.micromes.entities.channels
+package net.micromes.core.entities.channels
 
-import net.micromes.entities.ChannelContent
+import net.micromes.core.entities.ChannelContent
 
 interface ContentChannel: Channel {
 

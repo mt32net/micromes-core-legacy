@@ -1,4 +1,4 @@
-package net.micromes.entities
+package net.micromes.core.entities
 
 import java.time.LocalDateTime
 import java.util.*

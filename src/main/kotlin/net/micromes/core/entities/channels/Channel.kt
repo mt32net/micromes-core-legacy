@@ -1,4 +1,4 @@
-package net.micromes.entities.channels
+package net.micromes.core.entities.channels
 
 import java.util.*
 

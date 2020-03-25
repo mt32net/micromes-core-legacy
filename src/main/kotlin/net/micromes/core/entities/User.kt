@@ -1,8 +1,8 @@
-package net.micromes.entities
+package net.micromes.core.entities
 
-import net.micromes.config.Settings
-import net.micromes.entities.channels.PrivateChannel
-import net.micromes.entities.channels.PublicChannel
+import net.micromes.core.config.Settings
+import net.micromes.core.entities.channels.PrivateChannel
+import net.micromes.core.entities.channels.PublicChannel
 import java.net.URI
 import java.util.*
 

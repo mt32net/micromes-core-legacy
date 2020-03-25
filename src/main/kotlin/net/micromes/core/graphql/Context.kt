@@ -1,8 +1,8 @@
-package net.micromes.graphql
+package net.micromes.core.graphql
 
 import com.expediagroup.graphql.execution.GraphQLContext
-import net.micromes.entities.GoogleAccount
-import net.micromes.entities.User
+import net.micromes.core.entities.GoogleAccount
+import net.micromes.core.entities.User
 
 data class Context(
     val googleAccount: GoogleAccount
