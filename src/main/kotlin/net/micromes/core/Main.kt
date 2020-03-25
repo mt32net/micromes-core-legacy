@@ -25,10 +25,13 @@ import io.ktor.sessions.*
 import net.micromes.core.db.dBConnect
 import net.micromes.core.db.dBInit
 import net.micromes.core.entities.GoogleAccount
+import net.micromes.core.entities.user.User
+import net.micromes.core.entities.user.UserImpl
 import net.micromes.core.google.OAuthClient
 import net.micromes.core.graphql.Context
 import net.micromes.core.graphql.Mutation
 import net.micromes.core.graphql.Query
+import java.net.URI
 
 data class Body(
     val query : String,
@@ -36,12 +39,12 @@ data class Body(
     val variables: Map<String, String>
 )
 
-var googleOAuth: OAuthClient = OAuthClient()
+var oauthClient: OAuthClient = OAuthClient()
 
 fun main() {
     //mysql
-    dBConnect()
-    dBInit()
+    //dBConnect()
+    //dBInit()
 
     val gql = (GraphQL.newGraphQL(getSchema()) ?: return).build()
     embeddedServer(Netty, 8090) {
@@ -53,7 +56,14 @@ fun main() {
             get("/") {
                 call.respondText { "Hello" }
             }
-            post("/") {
+            post("/api") {
+                val authHeader = call.request.headers["Authorization"]
+                val idToken: String = authHeader?.substring(7) ?: "";
+                println(idToken);
+                val account : GoogleAccount = oauthClient.authenticate(idToken)
+                val user = UserImpl(
+                    name = account.name,
+                    profilePictureLocation = URI.create(account.pictureURl))
                 val rawBody = call.receive<String>()
                 val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
                 //val reqBody = call.receive<Map<String, String>>()
@@ -62,7 +72,7 @@ fun main() {
                     .query(reqBody.query)
                     .operationName(reqBody.operationName)
                     .variables(reqBody.variables)
-                    .context(Context())
+                    .context(Context(user))
                 val executionResult = gql.execute(execBuilder.build())
                 if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
                 call.respond(executionResult)
