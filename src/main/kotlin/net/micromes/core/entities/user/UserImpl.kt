@@ -3,18 +3,22 @@ package net.micromes.core.entities.user
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.config.Settings
+import net.micromes.core.db.DBObjects
 import net.micromes.core.entities.EntityImpl
 import net.micromes.core.entities.channels.Channel
 import net.micromes.core.entities.channels.PrivateChannel
 import net.micromes.core.entities.channels.PublicChannel
 import net.micromes.core.entities.guild.Guild
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.net.URI
 import java.util.*
 
 data class UserImpl(
     private val uuid : UUID = UUID.randomUUID(),
     private val name: String,
-    private val profilePictureLocation: URI = Settings.DEFAULT_LOGO_URL,
+    private var profilePictureLocation: URI = Settings.DEFAULT_LOGO_URL,
     private val status: Status = Status.OFFLINE
 ) : User, EntityImpl(uuid) {
 
@@ -59,6 +63,17 @@ data class UserImpl(
     @GraphQLIgnore
     override fun createPublicChannel(name: String, uuid: UUID) {
         TODO("Not yet implemented")
+    }
+
+    @GraphQLIgnore
+    override fun changeProfilePictureLocation(profilePictureLocation: URI) {
+        transaction {
+            DBObjects.Companion.Users.update({ DBObjects.Companion.Users.id eq getUUID() }) {
+                it[DBObjects.Companion.Users.profilePictureLocation] = profilePictureLocation.toString()
+            }
+        }
+        // TODO not really necessary???
+        this.profilePictureLocation = profilePictureLocation
     }
 
 }

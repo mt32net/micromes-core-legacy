@@ -44,4 +44,7 @@ interface User : Entity {
 
     @GraphQLIgnore
     fun createPublicChannel(name: String, uuid: UUID)
+
+    @GraphQLIgnore
+    fun changeProfilePictureLocation(profilePictureLocation: URI)
 }
