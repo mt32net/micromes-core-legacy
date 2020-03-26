@@ -6,7 +6,7 @@ import java.util.*
 
 abstract class EntityImpl(
     @GraphQLIgnore
-    private val uuid : UUID = UUID.randomUUID()
+    private val uuid : UUID
 ) : Entity {
 
     @GraphQLIgnore

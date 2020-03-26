@@ -11,4 +11,7 @@ interface Channel : Entity {
     fun getName(): String
     @GraphQLIgnore
     fun setName(name: String)
+
+    @GraphQLIgnore
+    fun getChecksum() : Int
 }
