@@ -1,10 +1,10 @@
 package net.micromes.core.entities.channels
 
-import net.micromes.core.entities.message.ChannelContentImpl
+import net.micromes.core.entities.message.ContentImpl
 
 interface ContentChannel: Channel {
 
-    fun getContent() : ChannelContentImpl
+    fun getContent() : ContentImpl
 
-    fun setContent(content: ChannelContentImpl)
+    fun setContent(content: ContentImpl)
 }

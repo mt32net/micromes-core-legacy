@@ -18,7 +18,7 @@ data class MessageImpl(
     @GraphQLName("content")
     override fun getContent(): String = content
 
-    @GraphQLName("time")
+    @GraphQLIgnore
     override fun getTime(): LocalDateTime = dateTime
 
     @GraphQLName("author")

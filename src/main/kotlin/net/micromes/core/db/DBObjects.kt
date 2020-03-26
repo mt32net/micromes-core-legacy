@@ -2,7 +2,7 @@ package net.micromes.core.db
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
-
+import org.jetbrains.exposed.sql.`java-time`.datetime
 
 class DBObjects {
     companion object {
@@ -10,6 +10,8 @@ class DBObjects {
             val name = varchar("name", 50)
             val profilePictureLocation = varchar("profilePictureLocation", 255)
             val externalID = varchar("externalid", 21).uniqueIndex()
+            val lastRequestTime = datetime("lastrequesttime")
+            val lastActionTime = datetime("lastactiontime")
         }
         object UsersByChannels : IntIdTable() {
             val user = reference("users", Users)
@@ -22,6 +24,7 @@ class DBObjects {
             val content = varchar("content", 255)
             val author = reference("author", Users)
             val channel = reference("messagechannels", MessageChannels)
+            val sendTime = datetime("sendtime")
         }
     }
 }
