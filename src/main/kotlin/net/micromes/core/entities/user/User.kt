@@ -40,6 +40,9 @@ interface User : Entity {
     fun getGuilds() : List<Guild>
 
     @GraphQLIgnore
+    fun changeName(name: String)
+
+    @GraphQLIgnore
     fun createPrivateChannel(name: String, uuid: UUID)
 
     @GraphQLIgnore

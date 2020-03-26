@@ -17,9 +17,9 @@ import java.util.*
 
 data class UserImpl(
     private val uuid : UUID = UUID.randomUUID(),
-    private val name: String,
+    private var name: String,
     private var profilePictureLocation: URI = Settings.DEFAULT_LOGO_URL,
-    private val status: Status = Status.OFFLINE
+    private var status: Status = Status.OFFLINE
 ) : User, EntityImpl(uuid) {
 
     private val privateChannels: List<PrivateChannel> = listOf()
@@ -54,6 +54,17 @@ data class UserImpl(
 
     @GraphQLIgnore
     override fun getGuilds(): List<Guild> = guilds
+
+    @GraphQLIgnore
+    override fun changeName(name: String) {
+        transaction {
+            DBObjects.Companion.Users.update({ DBObjects.Companion.Users.id eq getUUID() }) {
+                it[DBObjects.Companion.Users.name] = name
+            }
+        }
+        // TODO maybe only db?
+        this.name = name
+    }
 
     @GraphQLIgnore
     override fun createPrivateChannel(name: String, uuid: UUID) {

@@ -10,8 +10,12 @@ import java.net.URI
 class Mutation {
 
     fun changeProfilePictureLocation(context: Context, profilePictureLocation: String) : User {
-
         context.getUser().changeProfilePictureLocation(URI.create(profilePictureLocation))
+        return context.getUser()
+    }
+
+    fun changeName(context: Context, name: String) : User {
+        context.getUser().changeName(name)
         return context.getUser()
     }
 }
