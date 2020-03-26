@@ -8,6 +8,7 @@ import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.jackson2.JacksonFactory
 import net.micromes.core.config.Settings
 import net.micromes.core.entities.GoogleAccount
+import net.micromes.core.exceptions.NotAuthenticatedException
 import java.util.*
 
 class OAuthClient{
@@ -44,7 +45,7 @@ class OAuthClient{
                 name, pictureUrl, locale, givenName)
         } else {
             println("Invalid ID token.")
-            throw RuntimeException("Google id_token invalid: $idTokenString")
+            throw NotAuthenticatedException()
         }
     }
 }

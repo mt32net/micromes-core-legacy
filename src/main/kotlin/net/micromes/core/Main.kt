@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionInput
+import graphql.ExecutionResult
 import graphql.GraphQL
 import graphql.schema.GraphQLSchema
 import io.ktor.application.call
@@ -27,6 +28,8 @@ import net.micromes.core.db.dBInit
 import net.micromes.core.entities.GoogleAccount
 import net.micromes.core.entities.user.User
 import net.micromes.core.entities.user.UserImpl
+import net.micromes.core.exceptions.NotAuthenticatedException
+import net.micromes.core.exceptions.QueryException
 import net.micromes.core.google.OAuthClient
 import net.micromes.core.graphql.Context
 import net.micromes.core.graphql.Mutation
@@ -59,23 +62,35 @@ fun main() {
             post("/api") {
                 val authHeader = call.request.headers["Authorization"]
                 val idToken: String = authHeader?.substring(7) ?: "";
-                println(idToken);
-                val account : GoogleAccount = oauthClient.authenticate(idToken)
-                val user = UserImpl(
-                    name = account.name,
-                    profilePictureLocation = URI.create(account.pictureURl))
-                val rawBody = call.receive<String>()
-                val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
-                //val reqBody = call.receive<Map<String, String>>()
-                println(reqBody.variables)
-                val execBuilder = ExecutionInput.newExecutionInput()
-                    .query(reqBody.query)
-                    .operationName(reqBody.operationName)
-                    .variables(reqBody.variables)
-                    .context(Context(user))
-                val executionResult = gql.execute(execBuilder.build())
-                if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
-                call.respond(executionResult)
+                println(idToken)
+                val responseBodyOnError = object {
+                    val errors = mutableListOf<QueryException>()
+                }
+                try {
+                    val executionResult : ExecutionResult
+                    val account : GoogleAccount = oauthClient.authenticate(idToken)
+                    val user = UserImpl(
+                        name = account.name,
+                        profilePictureLocation = URI.create(account.pictureURl))
+                    val rawBody = call.receive<String>()
+                    val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
+                    //val reqBody = call.receive<Map<String, String>>()
+                    println(reqBody.variables)
+                    val execBuilder = ExecutionInput.newExecutionInput()
+                        .query(reqBody.query)
+                        .operationName(reqBody.operationName)
+                        .variables(reqBody.variables)
+                        .context(Context(user))
+                    executionResult = gql.execute(execBuilder.build())
+                    if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
+                    call.respond(executionResult)
+                    return@post
+                } catch (e: NotAuthenticatedException) {
+                    println("Hallo")
+                    e.printStackTrace()
+                    responseBodyOnError.errors.add(e)
+                }
+                call.respond(responseBodyOnError)
             }
         }
     }.start(true)
