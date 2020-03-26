@@ -13,8 +13,8 @@ import java.util.*
 class OAuthClient{
     var transport: HttpTransport = GoogleNetHttpTransport.newTrustedTransport()
     var jsonFactory: JsonFactory = JacksonFactory.getDefaultInstance()
-    val clientId = Settings.clientId
-    val clientSecret = Settings.clientSecret
+    val clientId = Settings.CLIENT_ID
+    val clientSecret = Settings.CLIENT_SECRET
     private var verifier: GoogleIdTokenVerifier
 
     init{
