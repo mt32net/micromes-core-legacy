@@ -60,13 +60,12 @@ fun main() {
                 call.respondText { "Hello" }
             }
             post("/api") {
-                val authHeader = call.request.headers["Authorization"]
-                val idToken: String = authHeader?.substring(7) ?: "";
-                println(idToken)
                 val responseBodyOnError = object {
                     val errors = mutableListOf<QueryException>()
                 }
                 try {
+                    val authHeader = call.request.headers["Authorization"]
+                    val idToken: String = authHeader?.substring(7) ?: throw NotAuthenticatedException("no authentication header")
                     val executionResult : ExecutionResult
                     val account : GoogleAccount = oauthClient.authenticate(idToken)
                     val user = UserImpl(
