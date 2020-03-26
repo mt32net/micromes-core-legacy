@@ -9,6 +9,8 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import net.micromes.core.config.Settings
 import net.micromes.core.entities.GoogleAccount
 import net.micromes.core.exceptions.NotAuthenticatedException
+import java.io.IOException
+import java.security.GeneralSecurityException
 import java.util.*
 
 class OAuthClient{
@@ -25,10 +27,20 @@ class OAuthClient{
     }
 
     fun authenticate(idTokenString: String): GoogleAccount {
-        val idToken: GoogleIdToken? = verifier.verify(idTokenString)
-        if (idToken != null) {
-            val payload: GoogleIdToken.Payload = idToken.payload
+        println("Start verifying")
+        var idToken: GoogleIdToken? = null;
+        try {
+            if(idTokenString.length == 1158)
+                idToken = verifier.verify(idTokenString)
+        }catch(e: GeneralSecurityException){
+            println(e)
+        }catch (e: IOException){
+            println(e)
+        }
 
+        if (idToken != null) {
+            println("Not null")
+            val payload: GoogleIdToken.Payload = idToken.payload
             // Print user identifier
             val userId: String = payload.subject
             println("User ID: $userId")
