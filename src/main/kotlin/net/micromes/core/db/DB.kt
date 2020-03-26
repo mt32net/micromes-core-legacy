@@ -6,6 +6,7 @@ import net.micromes.core.entities.user.UserImpl
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URI
+import java.time.LocalDateTime
 import net.micromes.core.db.DBObjects.Companion.Users as Users
 
 fun dBConnect() {
@@ -29,6 +30,8 @@ fun createNewUserAndReturn(user: User, googleID : String) : User {
             it[name] = user.getName()
             it[profilePictureLocation] = user.getProfilePictureURIAsString()
             it[externalID] = googleID
+            it[lastActionTime] = LocalDateTime.now()
+            it[lastRequestTime] = LocalDateTime.now()
         }
     }
     return user

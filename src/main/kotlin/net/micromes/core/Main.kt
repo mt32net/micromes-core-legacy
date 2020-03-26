@@ -87,12 +87,11 @@ fun main() {
                     val executionResult = gql.execute(execBuilder.build())
                     if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
                     call.respond(executionResult)
-                    return@post
                 } catch (e: QueryException) {
                     e.printStackTrace()
                     responseBodyOnError.errors.add(e)
+                    call.respond(responseBodyOnError)
                 }
-                call.respond(responseBodyOnError)
             }
         }
     }.start(true)
