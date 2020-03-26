@@ -1,8 +1,11 @@
 package net.micromes.core.db
 
+import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date
+import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.dateTime
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.Column
+
 
 class DBObjects {
     companion object {
