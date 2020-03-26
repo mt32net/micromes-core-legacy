@@ -1,8 +1,6 @@
 package net.micromes.core.graphql
 
-import net.micromes.core.entities.Entity
 import net.micromes.core.entities.message.Message
-import net.micromes.core.entities.channels.Channel
 import net.micromes.core.entities.channels.ContentChannel
 import net.micromes.core.entities.channels.MessageChannel
 import net.micromes.core.entities.channels.PrivateChannel

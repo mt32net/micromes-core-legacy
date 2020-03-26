@@ -3,7 +3,6 @@ package net.micromes.core.db
 import net.micromes.core.entities.user.Status
 import net.micromes.core.entities.user.User
 import net.micromes.core.entities.user.UserImpl
-import net.micromes.core.exceptions.UserNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URI
