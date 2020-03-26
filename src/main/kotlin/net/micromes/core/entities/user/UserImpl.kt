@@ -4,8 +4,10 @@ import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.config.Settings
 import net.micromes.core.entities.EntityImpl
+import net.micromes.core.entities.channels.Channel
 import net.micromes.core.entities.channels.PrivateChannel
 import net.micromes.core.entities.channels.PublicChannel
+import net.micromes.core.entities.guild.Guild
 import java.net.URI
 import java.util.*
 
@@ -18,6 +20,8 @@ data class UserImpl(
     private val publicChannels: List<PublicChannel> = listOf()
 ) : User, EntityImpl(uuid) {
 
+    private val guilds: MutableList<Guild> = mutableListOf()
+
     @GraphQLName("name")
     override fun getName(): String = name
 
@@ -28,9 +32,33 @@ data class UserImpl(
     override fun getProfilePictureLocation(): URI = profilePictureLocation
 
     @GraphQLIgnore
+    override fun getAllChannels(): List<Channel> {
+        val channels : MutableList<Channel> = mutableListOf()
+        channels.addAll(getPrivateChannels())
+        channels.addAll(getPublicChannels())
+        getGuilds().forEach {
+            channels.addAll(it.getChannels())
+        }
+        return channels
+    }
+
+    @GraphQLIgnore
     override fun getPrivateChannels(): List<PrivateChannel> = privateChannels
 
     @GraphQLIgnore
     override fun getPublicChannels(): List<PublicChannel> = publicChannels
+
+    @GraphQLIgnore
+    override fun getGuilds(): List<Guild> = guilds
+
+    @GraphQLIgnore
+    override fun createPrivateChannel(name: String, uuid: UUID) {
+        TODO("Not yet implemented")
+    }
+
+    @GraphQLIgnore
+    override fun createPublicChannel(name: String, uuid: UUID) {
+        TODO("Not yet implemented")
+    }
 
 }
