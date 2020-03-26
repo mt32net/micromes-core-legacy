@@ -16,7 +16,7 @@ import java.util.*
 class OAuthClient{
     var transport: HttpTransport = GoogleNetHttpTransport.newTrustedTransport()
     var jsonFactory: JsonFactory = JacksonFactory.getDefaultInstance()
-    val clientId = Settings.CLIENT_ID
+    private val clientId = Settings.CLIENT_ID
     val clientSecret = Settings.CLIENT_SECRET
     private var verifier: GoogleIdTokenVerifier
 
@@ -27,11 +27,10 @@ class OAuthClient{
     }
 
     fun authenticate(idTokenString: String): GoogleAccount {
-        println("Start verifying")
+        //println("Start verifying")
         var idToken: GoogleIdToken? = null;
         try {
-            if(idTokenString.length == 1158)
-                idToken = verifier.verify(idTokenString)
+            idToken = verifier.verify(idTokenString)
         }catch(e: GeneralSecurityException){
             println(e)
         }catch (e: IOException){
@@ -39,7 +38,7 @@ class OAuthClient{
         }
 
         if (idToken != null) {
-            println("Not null")
+            //println("Not null")
             val payload: GoogleIdToken.Payload = idToken.payload
             // Print user identifier
             val userId: String = payload.subject

@@ -15,11 +15,11 @@ data class UserImpl(
     private val uuid : UUID = UUID.randomUUID(),
     private val name: String,
     private val profilePictureLocation: URI = Settings.DEFAULT_LOGO_URL,
-    private val status: Status = Status.OFFLINE,
-    private val privateChannels: List<PrivateChannel> = listOf(),
-    private val publicChannels: List<PublicChannel> = listOf()
+    private val status: Status = Status.OFFLINE
 ) : User, EntityImpl(uuid) {
 
+    private val privateChannels: List<PrivateChannel> = listOf()
+    private val publicChannels: List<PublicChannel> = listOf()
     private val guilds: MutableList<Guild> = mutableListOf()
 
     @GraphQLName("name")

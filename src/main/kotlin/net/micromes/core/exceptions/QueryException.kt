@@ -1,5 +1,6 @@
 package net.micromes.core.exceptions
 
+import com.expediagroup.graphql.annotations.GraphQLIgnore
 import graphql.ErrorClassification
 import graphql.GraphQLError
 import graphql.language.SourceLocation
