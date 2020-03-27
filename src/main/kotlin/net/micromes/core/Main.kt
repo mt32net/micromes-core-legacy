@@ -35,6 +35,7 @@ import net.micromes.core.google.OAuthClient
 import net.micromes.core.graphql.Context
 import net.micromes.core.graphql.Mutation
 import net.micromes.core.graphql.Query
+import java.lang.RuntimeException
 import java.net.URI
 import java.util.*
 
@@ -66,15 +67,18 @@ fun main() {
                     val errors = mutableListOf<QueryException>()
                 }
                 try {
-                    val authHeader = call.request.headers["Authorization"]
-                    val idToken: String = authHeader?.substring(7) ?: throw NotAuthenticatedException("no authentication header")
-                    val account : GoogleAccount = oauthClient.authenticate(idToken)
-                    val user : User = getUserByExternalID(account.id) ?: createNewUserAndReturn(UserImpl(
-                        uuid = UUID.randomUUID(),
-                        name = account.givenName,
-                        status = Status.ONLINE,
-                        profilePictureLocation = URI.create(account.pictureURl)
-                    ), googleID = account.id)
+                    val user : User
+                    val token : String = call.request.headers["Authorization"] ?.substring(7) ?: throw NotAuthenticatedException("no authentication header")
+                    println(token)
+                    val account: GoogleAccount = oauthClient.authenticate(token)
+                    user = getUserByExternalID(account.id) ?: createNewUserAndReturn(
+                        UserImpl(
+                            uuid = UUID.randomUUID(),
+                            name = account.givenName,
+                            status = Status.ONLINE,
+                            profilePictureLocation = URI.create(account.pictureURl)
+                        ), googleID = account.id
+                    )
                     val rawBody = call.receive<String>()
                     val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
                     //val reqBody = call.receive<Map<String, String>>()
@@ -91,6 +95,8 @@ fun main() {
                     e.printStackTrace()
                     responseBodyOnError.errors.add(e)
                     call.respond(responseBodyOnError)
+                } catch (e: RuntimeException) {
+                    println(e.message)
                 }
             }
         }
