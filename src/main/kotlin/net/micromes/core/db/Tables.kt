@@ -2,9 +2,10 @@ package net.micromes.core.db
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.`java-time`.datetime
 
-class DBObjects {
+class Tables {
     companion object {
         object Users : UUIDTable() {
             val name = varchar("name", 50)
@@ -13,17 +14,20 @@ class DBObjects {
             val lastRequestTime = datetime("lastrequesttime")
             val lastActionTime = datetime("lastactiontime")
         }
-        object UsersByChannels : IntIdTable() {
-            val user = reference("users", Users)
-            val Channel = reference("messagechannels", MessageChannels)
+        object UsersByChannels : Table() {
+            val user = reference("userid", Users)
+            val channel = reference("channelid", Channels)
+            override val primaryKey = PrimaryKey(user, channel, name = "key")
         }
-        object MessageChannels : UUIDTable() {
+        object Channels : UUIDTable() {
             val name = varchar("name", 20)
+            val public = UsersByChannels.bool("public")
+            val contentURL = UsersByChannels.varchar("content", 511)
         }
         object Messages : UUIDTable() {
-            val content = varchar("content", 255)
+            val content = varchar("content", 1999)
             val author = reference("author", Users)
-            val channel = reference("messagechannels", MessageChannels)
+            val channel = reference("messagechannels", Channels)
             val sendTime = datetime("sendtime")
         }
     }

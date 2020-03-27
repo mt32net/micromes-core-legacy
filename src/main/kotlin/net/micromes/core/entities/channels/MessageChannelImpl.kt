@@ -7,21 +7,23 @@ import net.micromes.core.entities.message.Message
 import net.micromes.core.entities.message.MessageImpl
 import java.util.*
 
+@GraphQLIgnore
 abstract class MessageChannelImpl(
     private var name : String,
     private val uuid: UUID
 ) : EntityImpl(uuid), MessageChannel {
 
-    private val messages: MutableList<MessageImpl> = mutableListOf()
     private var lastHash: Int = 0
 
     @GraphQLIgnore
-    override fun getMessages(): Array<Message> = messages.toTypedArray()
+    override fun getMessages(): Array<Message> {
+        //TODO sql req here
+        return arrayOf()
+    }
 
     @GraphQLIgnore
     override fun sendMessage(message: MessageImpl) {
-        messages.add(message)
-        lastHash = message.hashCode()
+        net.micromes.core.db.sendMessage(channelID = getUUID(), content = message.getContent(), authorID = message.getAuthor().getUUID())
     }
 
     @GraphQLName("name")

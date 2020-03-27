@@ -6,7 +6,6 @@ import net.micromes.core.config.Settings.Companion.DATE_TIME_FORMATTER
 import net.micromes.core.entities.Entity
 import net.micromes.core.entities.user.User
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 interface Message : Entity {
 
