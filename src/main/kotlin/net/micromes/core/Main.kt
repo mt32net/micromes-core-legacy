@@ -1,5 +1,6 @@
 package net.micromes.core
 
+import net.micromes.core.auth.loadKey
 import com.expediagroup.graphql.SchemaGeneratorConfig
 import com.expediagroup.graphql.TopLevelObject
 import com.expediagroup.graphql.toSchema
@@ -9,35 +10,32 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionInput
 import graphql.GraphQL
 import graphql.schema.GraphQLSchema
+import io.jsonwebtoken.JwtException
+import io.jsonwebtoken.Jwts
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
+import io.ktor.http.HttpStatusCode
 import io.ktor.jackson.jackson
 import io.ktor.request.receive
 import io.ktor.response.respond
-import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import net.micromes.core.auth.getUserForToken
 import net.micromes.core.db.DBUser
 import net.micromes.core.db.dBConnect
 import net.micromes.core.db.dBInit
-import net.micromes.core.entities.GoogleAccount
-import net.micromes.core.entities.ID
-import net.micromes.core.entities.user.Status
 import net.micromes.core.entities.user.User
-import net.micromes.core.entities.user.UserImpl
-import net.micromes.core.exceptions.NotAuthenticatedException
 import net.micromes.core.exceptions.QueryException
-import net.micromes.core.google.OAuthClient
+import net.micromes.core.exceptions.SimpleHTTPException
+import net.micromes.core.exceptions.UserNotFound
 import net.micromes.core.graphql.Context
 import net.micromes.core.graphql.Mutation
 import net.micromes.core.graphql.Query
-import java.lang.RuntimeException
-import java.net.URI
-import java.util.*
+
 
 data class Body(
     val query : String,
@@ -45,7 +43,7 @@ data class Body(
     val variables: Map<String, String>
 )
 
-var oauthClient: OAuthClient = OAuthClient()
+val publicKey = loadKey()
 
 fun main() {
     //mysql
@@ -59,31 +57,32 @@ fun main() {
             }
         }
         routing {
-            get("/") {
-                call.respondText { "Hello" }
+            get("/getUserByID") {
+                try {
+                    val user: User = DBUser().getUserByID(call.request.queryParameters["id"]?.toLong() ?: throw SimpleHTTPException(400)) ?: throw UserNotFound()
+                    val externalUser = ExternalUser(user)
+                    call.respond(externalUser)
+                } catch (e: QueryException) {
+                    call.respond(HttpStatusCode(e.getRCode(), e.message ?: "Bad Request"))
+                } catch (e: SimpleHTTPException) {
+                    call.respond(HttpStatusCode(e.rCode, "Bad Request"))
+                }
             }
             post("/api") {
+
+                val token: String = call.request.headers["Authorization"]?.substring(7)
+                    ?: throw RuntimeException("No authentication header")
+
                 val dbUser = DBUser()
                 val responseBodyOnError = object {
                     val errors = mutableListOf<QueryException>()
                 }
                 try {
-                    val user : User
-                    val token : String = call.request.headers["Authorization"] ?.substring(7) ?: throw NotAuthenticatedException("no authentication header")
-                    println(token)
-                    val account: GoogleAccount = oauthClient.authenticate(token)
-                    user = dbUser.getUserByExternalID(account.id) ?: dbUser.createNewUserAndReturn(
-                        UserImpl(
-                            id = null,
-                            name = account.givenName,
-                            status = Status.ONLINE,
-                            profilePictureLocation = URI.create(account.pictureURl)
-                        ), googleID = account.id
-                    )
                     val rawBody = call.receive<String>()
                     val reqBody : Body = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).readValue(rawBody)
-                    //val reqBody = call.receive<Map<String, String>>()
-                    //println(reqBody.variables)
+
+                    val user: User = getUserForToken(token, publicKey)
+
                     val execBuilder = ExecutionInput.newExecutionInput()
                         .query(reqBody.query)
                         .operationName(reqBody.operationName)
@@ -96,8 +95,6 @@ fun main() {
                     e.printStackTrace()
                     responseBodyOnError.errors.add(e)
                     call.respond(responseBodyOnError)
-                } catch (e: RuntimeException) {
-                    println(e.message)
                 }
             }
         }

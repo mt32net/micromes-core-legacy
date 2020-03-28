@@ -27,7 +27,6 @@ class DBUser {
             val newUserID = Users.insertAndGetId {
                 it[name] = user.getName()
                 it[profilePictureLocation] = user.getProfilePictureURIAsString()
-                it[externalID] = googleID
                 it[lastActionTime] = LocalDateTime.now()
                 it[lastRequestTime] = LocalDateTime.now()
             }
@@ -35,25 +34,10 @@ class DBUser {
         return user
     }
 
-    fun getUserByExternalID(googleID: String): User? {
+    fun getUserByID(userID: Long): User? {
         var user: User? = null
         transaction {
-            Users.select { Users.externalID eq googleID }.forEach {
-                user = UserImpl(
-                    id = ID(it[Users.id].value),
-                    name = it[Users.name],
-                    status = Status.ONLINE,
-                    profilePictureLocation = URI.create(it[Users.profilePictureLocation])
-                )
-            }
-        }
-        return user
-    }
-
-    fun getUserByID(userID: ID): User? {
-        var user: User? = null
-        transaction {
-            Users.select { Tables.Companion.Users.id eq userID.getValue() }.forEach {
+            Users.select { Tables.Companion.Users.id eq userID }.forEach {
                 user = UserImpl(
                     id = ID(it[Users.id].value),
                     name = it[Users.name],

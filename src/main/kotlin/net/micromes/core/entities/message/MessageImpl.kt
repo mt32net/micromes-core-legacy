@@ -24,7 +24,7 @@ data class MessageImpl(
     override fun getTime(): LocalDateTime = timeSend
 
     @GraphQLName("author")
-    override fun getAuthor(): User = DBUser().getUserByID(authorID) ?: throw DBEntityNotFoundError()
+    override fun getAuthor(): User = DBUser().getUserByID(authorID.getValue()) ?: throw DBEntityNotFoundError()
 
     @GraphQLName("authorID")
     fun getAuthorIDAsString() : String = authorID.toString()

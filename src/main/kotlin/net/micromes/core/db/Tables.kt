@@ -13,7 +13,6 @@ class Tables {
         object Users : LongIdTable() {
             val name = varchar("name", 50)
             val profilePictureLocation = varchar("profilePictureLocation", 255)
-            val externalID = varchar("externalid", 21).uniqueIndex()
             val lastRequestTime = datetime("lastrequesttime")
             val lastActionTime = datetime("lastactiontime")
         }
