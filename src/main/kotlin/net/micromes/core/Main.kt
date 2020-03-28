@@ -21,11 +21,11 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import net.micromes.core.db.createNewUserAndReturn
+import net.micromes.core.db.DBUser
 import net.micromes.core.db.dBConnect
 import net.micromes.core.db.dBInit
-import net.micromes.core.db.getUserByExternalID
 import net.micromes.core.entities.GoogleAccount
+import net.micromes.core.entities.ID
 import net.micromes.core.entities.user.Status
 import net.micromes.core.entities.user.User
 import net.micromes.core.entities.user.UserImpl
@@ -63,6 +63,7 @@ fun main() {
                 call.respondText { "Hello" }
             }
             post("/api") {
+                val dbUser = DBUser()
                 val responseBodyOnError = object {
                     val errors = mutableListOf<QueryException>()
                 }
@@ -71,9 +72,9 @@ fun main() {
                     val token : String = call.request.headers["Authorization"] ?.substring(7) ?: throw NotAuthenticatedException("no authentication header")
                     println(token)
                     val account: GoogleAccount = oauthClient.authenticate(token)
-                    user = getUserByExternalID(account.id) ?: createNewUserAndReturn(
+                    user = dbUser.getUserByExternalID(account.id) ?: dbUser.createNewUserAndReturn(
                         UserImpl(
-                            uuid = UUID.randomUUID(),
+                            id = null,
                             name = account.givenName,
                             status = Status.ONLINE,
                             profilePictureLocation = URI.create(account.pictureURl)

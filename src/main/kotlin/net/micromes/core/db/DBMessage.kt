@@ -1,6 +1,7 @@
 package net.micromes.core.db
 
 import net.micromes.core.db.Tables.Companion.Messages
+import net.micromes.core.entities.ID
 import net.micromes.core.entities.message.Message
 import net.micromes.core.entities.message.MessageImpl
 import org.jetbrains.exposed.dao.id.EntityID
@@ -10,16 +11,16 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 import java.util.*
 
-fun getMessagesForChannelID(channelID: UUID) : Array<Message> {
+fun getMessagesForChannelID(channelID: Long) : Array<Message> {
     val messages : MutableList<Message> = mutableListOf()
     transaction {
         Messages.select{ Messages.channel eq channelID }.forEach {
             messages.add(
                 MessageImpl(
-                    uuid = it[Messages.id].value,
+                    id = ID(it[Messages.id].value),
                     content = it[Messages.content],
                     timeSend = it[Messages.sendTime],
-                    authorID = it[Messages.author].value
+                    authorID = ID(it[Messages.author].value)
                 )
             )
         }
@@ -27,7 +28,7 @@ fun getMessagesForChannelID(channelID: UUID) : Array<Message> {
     return messages.toTypedArray()
 }
 
-fun sendMessage(channelID: UUID, content: String, authorID: UUID) {
+fun sendMessage(channelID: Long, content: String, authorID: Long) {
     transaction {
         Messages.insert {
             it[Messages.content] = content
