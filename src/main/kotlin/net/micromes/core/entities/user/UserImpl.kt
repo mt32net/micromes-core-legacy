@@ -3,27 +3,26 @@ package net.micromes.core.entities.user
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.config.Settings
-import net.micromes.core.db.DBObjects
+import net.micromes.core.db.DBUser
+import net.micromes.core.db.Tables
 import net.micromes.core.entities.EntityImpl
+import net.micromes.core.entities.ID
 import net.micromes.core.entities.channels.Channel
 import net.micromes.core.entities.channels.PrivateChannel
 import net.micromes.core.entities.channels.PublicChannel
 import net.micromes.core.entities.guild.Guild
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.net.URI
 import java.util.*
 
 data class UserImpl(
-    private val uuid : UUID = UUID.randomUUID(),
+    private val id: ID?,
     private var name: String,
     private var profilePictureLocation: URI = Settings.DEFAULT_LOGO_URL,
     private var status: Status = Status.OFFLINE
-) : User, EntityImpl(uuid) {
+) : User, EntityImpl(id) {
 
-    private val privateChannels: List<PrivateChannel> = listOf()
-    private val publicChannels: List<PublicChannel> = listOf()
     private val guilds: MutableList<Guild> = mutableListOf()
 
     @GraphQLName("name")
@@ -47,22 +46,23 @@ data class UserImpl(
     }
 
     @GraphQLIgnore
-    override fun getPrivateChannels(): List<PrivateChannel> = privateChannels
+    override fun getPrivateChannels(): List<PrivateChannel> {
+        //TODO db request
+        return listOf()
+    }
 
     @GraphQLIgnore
-    override fun getPublicChannels(): List<PublicChannel> = publicChannels
+    override fun getPublicChannels(): List<PublicChannel> {
+        //TODO db request
+        return listOf()
+    }
 
     @GraphQLIgnore
     override fun getGuilds(): List<Guild> = guilds
 
     @GraphQLIgnore
     override fun changeName(name: String) {
-        transaction {
-            DBObjects.Companion.Users.update({ DBObjects.Companion.Users.id eq getUUID() }) {
-                it[DBObjects.Companion.Users.name] = name
-            }
-        }
-        // TODO maybe only db?
+
         this.name = name
     }
 
@@ -78,11 +78,8 @@ data class UserImpl(
 
     @GraphQLIgnore
     override fun changeProfilePictureLocation(profilePictureLocation: URI) {
-        transaction {
-            DBObjects.Companion.Users.update({ DBObjects.Companion.Users.id eq getUUID() }) {
-                it[DBObjects.Companion.Users.profilePictureLocation] = profilePictureLocation.toString()
-            }
-        }
+
+        DBUser().updateProfilePictures(getID().getValue(), profilePictureLocation.toString())
         // TODO not really necessary???
         this.profilePictureLocation = profilePictureLocation
     }
