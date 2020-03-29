@@ -2,6 +2,7 @@ package net.micromes.core.entities.user
 
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
+import net.micromes.core.ExternalUser
 import net.micromes.core.config.Settings
 import net.micromes.core.db.DBUser
 import net.micromes.core.db.Tables
@@ -22,6 +23,12 @@ data class UserImpl(
     private var profilePictureLocation: URI = Settings.DEFAULT_LOGO_URL,
     private var status: Status = Status.OFFLINE
 ) : User, EntityImpl(id) {
+
+    constructor(externalUser: ExternalUser) : this(
+        id = null,
+        name = externalUser.name,
+        profilePictureLocation = URI.create(externalUser.profilePictureURI)
+    )
 
     private val guilds: MutableList<Guild> = mutableListOf()
 

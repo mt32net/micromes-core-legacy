@@ -6,7 +6,7 @@ data class ID (private val value : Long) {
     constructor(value : String) : this(value.toLong())
 
     @GraphQLName("stringID")
-    fun getValueAsString() : String = value.toString()
+    override fun toString(): String = getValue().toString()
 
     @GraphQLName("valueLong")
     fun getValue() : Long = value

@@ -5,6 +5,7 @@ import com.expediagroup.graphql.SchemaGeneratorConfig
 import com.expediagroup.graphql.TopLevelObject
 import com.expediagroup.graphql.toSchema
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionInput
@@ -29,6 +30,7 @@ import net.micromes.core.db.DBUser
 import net.micromes.core.db.dBConnect
 import net.micromes.core.db.dBInit
 import net.micromes.core.entities.user.User
+import net.micromes.core.entities.user.UserImpl
 import net.micromes.core.exceptions.QueryException
 import net.micromes.core.exceptions.SimpleHTTPException
 import net.micromes.core.exceptions.UserNotFound
@@ -63,17 +65,25 @@ fun main() {
                     val externalUser = ExternalUser(user)
                     call.respond(externalUser)
                 } catch (e: QueryException) {
-                    call.respond(HttpStatusCode(e.getRCode(), e.message ?: "Bad Request"))
+                    call.respond(HttpStatusCode(e.getRCode(), e.message ?: "Not Found"))
                 } catch (e: SimpleHTTPException) {
                     call.respond(HttpStatusCode(e.rCode, "Bad Request"))
+                }
+            }
+            post("/createUser") {
+                try {
+                    val rawBody = call.receive<String>()
+                    val incomingUser: ExternalUser = jacksonObjectMapper().readValue(rawBody)
+                    DBUser().createNewUserWithID(UserImpl(incomingUser))
+                    call.respond(HttpStatusCode.OK)
+                } catch (e: JsonMappingException) {
+                    call.respond(HttpStatusCode.BadRequest, e.message ?: "")
                 }
             }
             post("/api") {
 
                 val token: String = call.request.headers["Authorization"]?.substring(7)
                     ?: throw RuntimeException("No authentication header")
-
-                val dbUser = DBUser()
                 val responseBodyOnError = object {
                     val errors = mutableListOf<QueryException>()
                 }

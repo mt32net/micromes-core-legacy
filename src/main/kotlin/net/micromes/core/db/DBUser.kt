@@ -5,6 +5,8 @@ import net.micromes.core.entities.ID
 import net.micromes.core.entities.user.Status
 import net.micromes.core.entities.user.User
 import net.micromes.core.entities.user.UserImpl
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -22,16 +24,17 @@ class DBUser {
         }
     }
 
-    fun createNewUserAndReturn(user: User, googleID: String): User {
+    fun createNewUserWithID(user: User) {
         transaction {
-            val newUserID = Users.insertAndGetId {
+            Users.insert {
+                it[Users.id] = EntityID(user.getID().getValue(), Users)
                 it[name] = user.getName()
                 it[profilePictureLocation] = user.getProfilePictureURIAsString()
                 it[lastActionTime] = LocalDateTime.now()
                 it[lastRequestTime] = LocalDateTime.now()
             }
+
         }
-        return user
     }
 
     fun getUserByID(userID: Long): User? {

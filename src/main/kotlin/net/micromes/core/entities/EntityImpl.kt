@@ -10,10 +10,10 @@ abstract class EntityImpl(
     private val id : ID?
 ) : Entity {
 
-    @GraphQLID
     @GraphQLIgnore
     override fun getID(): ID = id ?: throw NoIDYetError()
 
+    @GraphQLID
     @GraphQLName("uuid")
     override fun getUUIDString() : String = getID().toString()
 }
