@@ -11,6 +11,6 @@ interface Entity{
     fun getID(): ID
 
     @GraphQLID
-    @GraphQLName("uuid")
-    fun getUUIDString(): String
+    @GraphQLName("id")
+    fun getUUIDString() : String = getID().toString()
 }

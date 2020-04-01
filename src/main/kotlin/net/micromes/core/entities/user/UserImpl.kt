@@ -2,44 +2,35 @@ package net.micromes.core.entities.user
 
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
-import net.micromes.core.ExternalUser
-import net.micromes.core.config.Settings
+import net.micromes.core.db.DBChannel
 import net.micromes.core.db.DBUser
-import net.micromes.core.db.Tables
 import net.micromes.core.entities.EntityImpl
 import net.micromes.core.entities.ID
 import net.micromes.core.entities.channels.Channel
 import net.micromes.core.entities.channels.PrivateChannel
+import net.micromes.core.entities.channels.PrivateMessageChannel
 import net.micromes.core.entities.channels.PublicChannel
 import net.micromes.core.entities.guild.Guild
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
+import net.micromes.core.exceptions.DBEntityNotFoundError
 import java.net.URI
-import java.util.*
 
 data class UserImpl(
     private val id: ID?,
-    private var name: String,
-    private var profilePictureLocation: URI = Settings.DEFAULT_LOGO_URL,
     private var status: Status = Status.OFFLINE
 ) : User, EntityImpl(id) {
 
-    constructor(externalUser: ExternalUser) : this(
-        id = null,
-        name = externalUser.name,
-        profilePictureLocation = URI.create(externalUser.profilePictureURI)
-    )
-
-    private val guilds: MutableList<Guild> = mutableListOf()
-
     @GraphQLName("name")
-    override fun getName(): String = name
+    override fun getName(): String {
+        return DBUser().getUserByID(getID().getValue())?.getName() ?: throw DBEntityNotFoundError()
+    }
 
     @GraphQLName("status")
     override fun getStatus(): Status = status
 
     @GraphQLIgnore
-    override fun getProfilePictureLocation(): URI = profilePictureLocation
+    override fun getProfilePictureLocation(): URI {
+        return DBUser().getUserByID(getID().getValue())?.getProfilePictureLocation() ?: throw DBEntityNotFoundError()
+    }
 
     @GraphQLIgnore
     override fun getAllChannels(): List<Channel> {
@@ -54,41 +45,39 @@ data class UserImpl(
 
     @GraphQLIgnore
     override fun getPrivateChannels(): List<PrivateChannel> {
-        //TODO db request
-        return listOf()
+        return DBChannel().getPrivateChannelsForUserID(getID().getValue())
     }
 
     @GraphQLIgnore
     override fun getPublicChannels(): List<PublicChannel> {
-        //TODO db request
-        return listOf()
+        TODO("DB Requets")
     }
 
     @GraphQLIgnore
-    override fun getGuilds(): List<Guild> = guilds
-
-    @GraphQLIgnore
-    override fun changeName(name: String) {
-
-        this.name = name
-    }
-
-    @GraphQLIgnore
-    override fun createPrivateChannel(name: String, uuid: UUID) {
+    override fun getGuilds(): List<Guild> {
         TODO("Not yet implemented")
     }
 
     @GraphQLIgnore
-    override fun createPublicChannel(name: String, uuid: UUID) {
+    override fun changeName(name: String) {
+        TODO("Not yet implemented")
+    }
+
+    @GraphQLIgnore
+    override fun createPrivateMessageChannel(name: String, partnerIDs: Array<ID>): PrivateMessageChannel {
+        val ids : MutableList<Long> = mutableListOf(getID().getValue())
+        partnerIDs.forEach { id: ID -> ids.add(id.getValue()) }
+        return DBChannel().createPrivateMessageChannel(name, ids.toTypedArray())
+    }
+
+    @GraphQLIgnore
+    override fun createPublicMessageChannel(name: String) {
         TODO("Not yet implemented")
     }
 
     @GraphQLIgnore
     override fun changeProfilePictureLocation(profilePictureLocation: URI) {
-
         DBUser().updateProfilePictures(getID().getValue(), profilePictureLocation.toString())
-        // TODO not really necessary???
-        this.profilePictureLocation = profilePictureLocation
     }
 
 }

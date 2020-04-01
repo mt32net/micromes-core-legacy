@@ -4,10 +4,9 @@ import net.micromes.core.db.Tables.Companion.Users
 import net.micromes.core.entities.ID
 import net.micromes.core.entities.user.Status
 import net.micromes.core.entities.user.User
-import net.micromes.core.entities.user.UserImpl
+import net.micromes.core.entities.user.UserDataImpl
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -24,16 +23,15 @@ class DBUser {
         }
     }
 
-    fun createNewUserWithID(user: User) {
+    fun createNewUser(userID: Long, userName: String, profilePictureLocation: String) {
         transaction {
             Users.insert {
-                it[Users.id] = EntityID(user.getID().getValue(), Users)
-                it[name] = user.getName()
-                it[profilePictureLocation] = user.getProfilePictureURIAsString()
+                it[Users.id] = EntityID(userID, Users)
+                it[name] = userName
+                it[Users.profilePictureLocation] = profilePictureLocation
                 it[lastActionTime] = LocalDateTime.now()
                 it[lastRequestTime] = LocalDateTime.now()
             }
-
         }
     }
 
@@ -41,11 +39,11 @@ class DBUser {
         var user: User? = null
         transaction {
             Users.select { Tables.Companion.Users.id eq userID }.forEach {
-                user = UserImpl(
+                user = UserDataImpl(
                     id = ID(it[Users.id].value),
-                    name = it[Users.name],
-                    profilePictureLocation = URI.create(it[Tables.Companion.Users.profilePictureLocation]),
-                    status = Status.ONLINE
+                    status = Status.ONLINE,
+                    profilePictureLocation = URI.create(it[Users.profilePictureLocation]),
+                    name = it[Users.name]
                 )
             }
         }

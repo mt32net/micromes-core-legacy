@@ -1,10 +1,6 @@
 package net.micromes.core.db
 
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.dao.id.UUIDTable
-import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.`java-time`.datetime
 
@@ -19,12 +15,11 @@ class Tables {
         object UsersByChannels : Table() {
             val user = reference("userid", Users)
             val channel = reference("channelid", Channels)
-            override val primaryKey = PrimaryKey(user, channel, name = "key")
         }
         object Channels : LongIdTable() {
             val name = varchar("name", 20)
-            val public = UsersByChannels.bool("public")
-            val contentURL = UsersByChannels.varchar("content", 511)
+            val public = bool("public").default(false)
+            val contentURL = varchar("content", 255)
         }
         object Messages : LongIdTable() {
             val content = varchar("content", 1999)
