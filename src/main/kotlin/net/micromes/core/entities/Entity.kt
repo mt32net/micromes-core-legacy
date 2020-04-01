@@ -7,10 +7,10 @@ import com.expediagroup.graphql.annotations.GraphQLName
 @GraphQLIgnore
 interface Entity{
 
-    @GraphQLID
     @GraphQLIgnore
     fun getID(): ID
 
-    @GraphQLName("uuid")
-    fun getUUIDString(): String
+    @GraphQLID
+    @GraphQLName("id")
+    fun getUUIDString() : String = getID().toString()
 }

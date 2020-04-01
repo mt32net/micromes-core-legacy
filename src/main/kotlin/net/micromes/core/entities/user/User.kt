@@ -3,12 +3,13 @@ package net.micromes.core.entities.user
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.entities.Entity
+import net.micromes.core.entities.ID
 import net.micromes.core.entities.channels.Channel
 import net.micromes.core.entities.channels.PrivateChannel
+import net.micromes.core.entities.channels.PrivateMessageChannel
 import net.micromes.core.entities.channels.PublicChannel
 import net.micromes.core.entities.guild.Guild
 import java.net.URI
-import java.util.*
 
 interface User : Entity {
 
@@ -43,10 +44,10 @@ interface User : Entity {
     fun changeName(name: String)
 
     @GraphQLIgnore
-    fun createPrivateChannel(name: String, uuid: UUID)
+    fun createPrivateMessageChannel(name: String, partnerIDs: Array<ID>): PrivateMessageChannel
 
     @GraphQLIgnore
-    fun createPublicChannel(name: String, uuid: UUID)
+    fun createPublicMessageChannel(name: String)
 
     @GraphQLIgnore
     fun changeProfilePictureLocation(profilePictureLocation: URI)

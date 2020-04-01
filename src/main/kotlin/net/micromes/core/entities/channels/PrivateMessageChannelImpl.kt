@@ -4,13 +4,11 @@ import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.entities.ID
 import net.micromes.core.entities.user.UserImpl
-import java.util.*
 
 class PrivateMessageChannelImpl(
     private val id : ID,
-    private val channelName : String,
-    private val userIDs : Array<ID>
-) : PrivateChannel, MessageChannel, MessageChannelImpl(
+    private val channelName : String
+) : PrivateMessageChannel, MessageChannelImpl(
     id = id,
     name = channelName
 ) {
@@ -21,7 +19,9 @@ class PrivateMessageChannelImpl(
     }
 
     @GraphQLIgnore
-    fun getUserIDs() : Array<ID> = userIDs
+    fun getUserIDs() : Array<ID> {
+        TODO("Not yet")
+    }
 
     @GraphQLName("userIDs")
     fun getUserStringIDs() : List<String> = getUserIDs().map { uuid -> uuid.toString() }

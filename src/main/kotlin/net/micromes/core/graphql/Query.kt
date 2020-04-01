@@ -4,7 +4,6 @@ import net.micromes.core.db.getMessagesForChannelID
 import net.micromes.core.entities.channels.PrivateChannel
 import net.micromes.core.entities.message.Message
 import net.micromes.core.entities.user.User
-import java.util.*
 
 class Query {
 

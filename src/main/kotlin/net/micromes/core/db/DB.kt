@@ -13,7 +13,8 @@ fun dBInit() {
         SchemaUtils.create(
             Tables.Companion.UsersByChannels,
             Tables.Companion.Channels,
-            Tables.Companion.Messages
+            Tables.Companion.Messages,
+            Tables.Companion.Users
         )
     }
 }

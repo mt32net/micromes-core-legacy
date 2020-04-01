@@ -3,10 +3,12 @@ package net.micromes.core.graphql
 import net.micromes.core.db.DBChannel
 import net.micromes.core.entities.ID
 import net.micromes.core.entities.channels.MessageChannel
+import net.micromes.core.entities.channels.PrivateChannel
+import net.micromes.core.entities.channels.PrivateMessageChannel
+import net.micromes.core.entities.channels.PrivateMessageChannelImpl
 import net.micromes.core.entities.user.User
 import net.micromes.core.exceptions.MessageChannelNotExistentException
 import java.net.URI
-import java.util.*
 
 class Mutation {
 
@@ -27,8 +29,7 @@ class Mutation {
         return dbChannel.getMessageChannelByID(channelID = ID(channelID)) ?: throw MessageChannelNotExistentException()
     }
 
-    fun createPrivateMessageChannel(context: Context, name: String, partnerID: String) : Boolean {
-        dbChannel.createPrivateMessageChannel(name = name, usersIDs = arrayOf(context.getUser().getID().getValue(), partnerID.toLong()))
-        return true
+    fun createPrivateMessageChannel(context: Context, name: String, partnerID: String) : PrivateChannel {
+        return context.getUser().createPrivateMessageChannel(name, arrayOf(ID(partnerID)))
     }
 }
