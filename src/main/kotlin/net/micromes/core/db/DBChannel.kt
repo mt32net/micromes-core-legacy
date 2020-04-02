@@ -71,4 +71,14 @@ class DBChannel {
         }
         return channels
     }
+
+    fun addUserToChannel(userID: Long, channelID: Long) {
+        transaction {
+            addLogger(StdOutSqlLogger)
+            UsersByChannels.insert {
+                it[UsersByChannels.channel] = EntityID(channelID, Channels)
+                it[UsersByChannels.user] = EntityID(userID, Tables.Companion.Users)
+            }
+        }
+    }
 }

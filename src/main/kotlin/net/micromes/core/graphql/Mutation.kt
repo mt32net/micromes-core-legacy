@@ -24,12 +24,17 @@ class Mutation {
         return context.getUser()
     }
 
-    fun sendMessage(context: Context, channelID: String, content: String) : MessageChannel {
+    fun sendMessage(context: Context, channelID: String, content: String) : Boolean {
         net.micromes.core.db.sendMessage(content = content, channelID = channelID.toLong(), authorID = context.getUser().getID().getValue())
-        return dbChannel.getMessageChannelByID(channelID = ID(channelID)) ?: throw MessageChannelNotExistentException()
+        return true
     }
 
     fun createPrivateMessageChannel(context: Context, name: String, partnerID: String) : PrivateChannel {
         return context.getUser().createPrivateMessageChannel(name, arrayOf(ID(partnerID)))
+    }
+
+    fun addUserToChannel(userID: String, channelID: String) : Boolean {
+        DBChannel().addUserToChannel(userID = userID.toLong(), channelID = channelID.toLong())
+        return true
     }
 }

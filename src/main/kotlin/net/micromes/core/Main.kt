@@ -56,6 +56,23 @@ fun main() {
             }
         }
         routing {
+            post("/registerUser") {
+                val token: String = call.request.headers["Authorization"]?.substring(7)
+                    ?: throw RuntimeException("No authentication header")
+                try {
+                    val payload = getTokenPayload(token, publicKey)
+                    if (!payload.newUser) throw InvalidTokenPayload()
+                    DBUser().createNewUser(
+                        payload.sub.toLong(),
+                        payload.newName ?: throw InvalidTokenPayload(),
+                        Settings.DEFAULT_LOGO_URL.toASCIIString()
+                    )
+                    call.respond(HttpStatusCode.Created)
+                } catch (e: QueryException) {
+                    e.printStackTrace()
+                    call.respond(e.message ?: "error")
+                }
+            }
             post("/api") {
 
                 val token: String = call.request.headers["Authorization"]?.substring(7)
@@ -69,11 +86,7 @@ fun main() {
 
                     val payload = getTokenPayload(token, publicKey)
                     if (payload.newUser) {
-                        DBUser().createNewUser(
-                            payload.sub.toLong(),
-                            payload.newName ?: throw InvalidTokenPayload(),
-                            Settings.DEFAULT_LOGO_URL.toASCIIString()
-                        )
+                        throw InvalidTokenPayload()
                     }
                     val user = UserImpl(id = ID(payload.sub.toLong()))
                     val execBuilder = ExecutionInput.newExecutionInput()
