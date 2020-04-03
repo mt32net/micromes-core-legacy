@@ -4,9 +4,12 @@ import com.expediagroup.graphql.SchemaGeneratorConfig
 import com.expediagroup.graphql.TopLevelObject
 import com.expediagroup.graphql.toSchema
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationConfig
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionInput
+import graphql.ExecutionResult
 import graphql.GraphQL
 import graphql.schema.GraphQLSchema
 import io.ktor.application.call
@@ -94,9 +97,9 @@ fun main() {
                         .operationName(reqBody.operationName)
                         .variables(reqBody.variables)
                         .context(Context(user))
-                    val executionResult = gql.execute(execBuilder.build())
+                    val executionResult: ExecutionResult = gql.execute(execBuilder.build())
                     if (executionResult.errors.isNotEmpty()) println(executionResult.errors[0].message)
-                    call.respond(executionResult)
+                    call.respond(executionResult.toSpecification())
                 } catch (e: QueryException) {
                     e.printStackTrace()
                     responseBodyOnError.errors.add(e)
