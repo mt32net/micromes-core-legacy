@@ -7,7 +7,7 @@ everyone can customize
 
 ## Contribute
 
-If you want to contrubute just open a Pull Request or an issue. There are no generell instructions, becaouse there is not a lot working yet and things change quickly. So there is also no Build section
+If you want to contrubute just open a Pull Request or an issue. There are no generell instructions, because there is not a lot working yet and things change quickly. There is also no Build section
 
 ## Build
 
@@ -15,7 +15,7 @@ This section is not even under construction, it is simply not existing
 
 ## License
 
-GNU GPL v2 at the moment
+GNU GPL v2, at the moment
 
 ## Authors
 
