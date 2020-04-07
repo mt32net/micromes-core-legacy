@@ -15,8 +15,8 @@ class Query {
     fun guilds(context: Context) : List<Guild> = context.getUser().getGuilds()
     fun getGuildByID(context: Context, guildID: String) = context.getUser().getGuildByID(guildID = ID(guildID))
 
-    fun messagesForNonGuildChannel(context: Context, channelID: String) : Array<Message> {
-        val channel = context.getUser().getNonGuildChannelByID(channelID = ID(channelID))
+    fun messagesForChannel(context: Context, channelID: String) : Array<Message> {
+        val channel = context.getUser().getChannelByID(channelID = ID(channelID))
         if (channel is MessageChannel) return channel.getMessages()
         else throw WrongChannelTypeException()
     }

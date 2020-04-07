@@ -13,7 +13,7 @@ import net.micromes.core.exceptions.ChannelNotFound
 import net.micromes.core.exceptions.DBEntityNotFoundError
 import java.net.URI
 
-data class UserImpl(
+open class UserImpl(
     private val id: ID?,
     private var status: Status = Status.OFFLINE
 ) : User, EntityImpl(id) {
@@ -59,6 +59,11 @@ data class UserImpl(
     override fun getGuildByID(guildID: ID) : Guild? {
         if (!checkUserInGuild(guildID)) return null
         return DBGuild().getGuildByID(guildID.getValue())
+    }
+
+    @GraphQLIgnore
+    override fun getChannelByID(channelID: ID): Channel? {
+        return (getNonGuildChannelByID(channelID) ?: getGuildChannelByID(channelID))
     }
 
     @GraphQLIgnore

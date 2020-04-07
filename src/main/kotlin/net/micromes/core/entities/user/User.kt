@@ -39,10 +39,13 @@ interface User : Entity {
     fun getGuildByID(guildID: ID) : Guild?
 
     @GraphQLIgnore
-    fun getNonGuildChannelByID(channelID: ID) : Channel?
+    fun getChannelByID(channelID: ID) : Channel?
 
     @GraphQLIgnore
     fun getGuildChannelByID(channelID: ID) : GuildChannel?
+
+    @GraphQLIgnore
+    fun getNonGuildChannelByID(channelID: ID): Channel?
 
     @GraphQLIgnore
     fun changeName(name: String)

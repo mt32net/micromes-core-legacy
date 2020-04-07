@@ -7,6 +7,7 @@ import net.micromes.core.entities.guild.GuildImpl
 import net.micromes.core.entities.message.MessageImpl
 import net.micromes.core.entities.user.User
 import net.micromes.core.entities.user.UserImpl
+import net.micromes.core.exceptions.ChannelNotFound
 import net.micromes.core.exceptions.NotPartOfGuild
 import net.micromes.core.exceptions.WrongChannelTypeException
 import java.net.URI
@@ -24,7 +25,7 @@ class Mutation {
     }
 
     fun sendMessage(context: Context, channelID: String, content: String) : Boolean {
-        val channel = context.getUser().getNonGuildChannelByID(ID(channelID))
+        val channel = context.getUser().getChannelByID(ID(channelID))
         if (channel is MessageChannel) channel.sendMessage(MessageImpl(
             id = null,
             content = content,
@@ -40,7 +41,7 @@ class Mutation {
     }
 
     fun addUserToChannel(context: Context, userID: String, channelID: String) : Boolean {
-        val channel = context.getUser().getNonGuildChannelByID(ID(channelID))
+        val channel : Channel = context.getUser().getNonGuildChannelByID(ID(channelID)) ?: throw ChannelNotFound()
         if (channel is PrivateChannel) channel.addUser(UserImpl(ID(userID)))
         else throw WrongChannelTypeException()
         return true
