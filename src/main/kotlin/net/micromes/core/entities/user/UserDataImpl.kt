@@ -4,10 +4,7 @@ import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.entities.EntityImpl
 import net.micromes.core.entities.ID
-import net.micromes.core.entities.channels.Channel
-import net.micromes.core.entities.channels.PrivateChannel
-import net.micromes.core.entities.channels.PrivateMessageChannel
-import net.micromes.core.entities.channels.PublicChannel
+import net.micromes.core.entities.channels.*
 import net.micromes.core.entities.guild.Guild
 import java.net.URI
 
@@ -40,6 +37,21 @@ class UserDataImpl(
     override fun getGuilds(): List<Guild> = UserImpl(getID()).getGuilds()
 
     @GraphQLIgnore
+    override fun getGuildByID(guildID: ID) : Guild? {
+        TODO("impl")
+    }
+
+    @GraphQLIgnore
+    override fun getNonGuildChannelByID(channelID: ID): Channel? {
+        TODO("Not yet implemented")
+    }
+
+    @GraphQLIgnore
+    override fun getGuildChannelByID(channelID: ID): GuildChannel? {
+        TODO("Not yet implemented")
+    }
+
+    @GraphQLIgnore
     override fun changeName(name: String) {
         UserImpl(getID()).changeName(name)
     }
@@ -58,4 +70,7 @@ class UserDataImpl(
     override fun changeProfilePictureLocation(profilePictureLocation: URI) {
         UserImpl(getID()).changeProfilePictureLocation(profilePictureLocation)
     }
+
+    @GraphQLIgnore
+    override fun createGuild(guild: Guild) = UserImpl(getID()).createGuild(guild)
 }

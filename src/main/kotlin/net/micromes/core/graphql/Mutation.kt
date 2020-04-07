@@ -1,18 +1,17 @@
 package net.micromes.core.graphql
 
-import net.micromes.core.db.DBChannel
+import net.micromes.core.config.Settings
 import net.micromes.core.entities.ID
-import net.micromes.core.entities.channels.MessageChannel
-import net.micromes.core.entities.channels.PrivateChannel
-import net.micromes.core.entities.channels.PrivateMessageChannel
-import net.micromes.core.entities.channels.PrivateMessageChannelImpl
+import net.micromes.core.entities.channels.*
+import net.micromes.core.entities.guild.GuildImpl
+import net.micromes.core.entities.message.MessageImpl
 import net.micromes.core.entities.user.User
-import net.micromes.core.exceptions.MessageChannelNotExistentException
+import net.micromes.core.entities.user.UserImpl
+import net.micromes.core.exceptions.NotPartOfGuild
+import net.micromes.core.exceptions.WrongChannelTypeException
 import java.net.URI
 
 class Mutation {
-
-    private val dbChannel = DBChannel()
 
     fun changeProfilePictureLocation(context: Context, profilePictureLocation: String) : User {
         context.getUser().changeProfilePictureLocation(URI.create(profilePictureLocation))
@@ -25,7 +24,14 @@ class Mutation {
     }
 
     fun sendMessage(context: Context, channelID: String, content: String) : Boolean {
-        net.micromes.core.db.sendMessage(content = content, channelID = channelID.toLong(), authorID = context.getUser().getID().getValue())
+        val channel = context.getUser().getNonGuildChannelByID(ID(channelID))
+        if (channel is MessageChannel) channel.sendMessage(MessageImpl(
+            id = null,
+            content = content,
+            authorID = context.getUser().getID(),
+            timeSend = null
+        ))
+        else throw WrongChannelTypeException()
         return true
     }
 
@@ -33,8 +39,24 @@ class Mutation {
         return context.getUser().createPrivateMessageChannel(name, arrayOf(ID(partnerID)))
     }
 
-    fun addUserToChannel(userID: String, channelID: String) : Boolean {
-        DBChannel().addUserToChannel(userID = userID.toLong(), channelID = channelID.toLong())
+    fun addUserToChannel(context: Context, userID: String, channelID: String) : Boolean {
+        val channel = context.getUser().getNonGuildChannelByID(ID(channelID))
+        if (channel is PrivateChannel) channel.addUser(UserImpl(ID(userID)))
+        else throw WrongChannelTypeException()
         return true
+    }
+
+    fun createGuild(context: Context, name: String) : Boolean {
+        context.getUser().createGuild(GuildImpl(name = name, iconLocation = Settings.STANDARD_GUILD_ICON, id = null))
+        return true
+    }
+
+    fun createGuildChannel(context: Context, guildID: Long, name: String) : GuildChannel {
+        val newChannel = GuildMessageChannelImpl(
+            channelName = name,
+            id = null
+        )
+        context.getUser().getGuildByID(guildID = ID(guildID))?.createChannel(newChannel) ?: throw NotPartOfGuild()
+        return newChannel
     }
 }

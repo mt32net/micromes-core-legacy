@@ -18,6 +18,9 @@ interface Message : Entity {
     @GraphQLName("author")
     fun getAuthor() : User
 
-    @GraphQLName("time")
-    fun getTimeStamp() : String = getTime().format(DATE_TIME_FORMATTER)
+    @GraphQLName("dateTime")
+    fun getTimeStamp() : String = getTime().toString()
+
+    @GraphQLName("authorID")
+    fun getAuthorIDAsString() : String
 }

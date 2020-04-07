@@ -9,9 +9,9 @@ import net.micromes.core.entities.message.MessageImpl
 import java.util.*
 
 @GraphQLIgnore
-abstract class MessageChannelImpl(
+open class MessageChannelImpl(
     private var name : String,
-    private val id: ID
+    private val id: ID?
 ) : EntityImpl(id), MessageChannel {
 
     private var lastHash: Int = 0

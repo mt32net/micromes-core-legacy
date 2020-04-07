@@ -3,14 +3,13 @@ package net.micromes.core.entities.user
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.db.DBChannel
+import net.micromes.core.db.DBGuild
 import net.micromes.core.db.DBUser
 import net.micromes.core.entities.EntityImpl
 import net.micromes.core.entities.ID
-import net.micromes.core.entities.channels.Channel
-import net.micromes.core.entities.channels.PrivateChannel
-import net.micromes.core.entities.channels.PrivateMessageChannel
-import net.micromes.core.entities.channels.PublicChannel
+import net.micromes.core.entities.channels.*
 import net.micromes.core.entities.guild.Guild
+import net.micromes.core.exceptions.ChannelNotFound
 import net.micromes.core.exceptions.DBEntityNotFoundError
 import java.net.URI
 
@@ -45,17 +44,34 @@ data class UserImpl(
 
     @GraphQLIgnore
     override fun getPrivateChannels(): List<PrivateChannel> {
-        return DBChannel().getPrivateChannelsForUserID(getID().getValue())
+        return DBChannel().getChannelsForUserID(getID().getValue()).filterIsInstance<PrivateChannel>()
     }
 
     @GraphQLIgnore
     override fun getPublicChannels(): List<PublicChannel> {
-        TODO("DB Requets")
+        return DBChannel().getChannelsForUserID(getID().getValue()).filterIsInstance<PublicChannel>()
     }
 
     @GraphQLIgnore
-    override fun getGuilds(): List<Guild> {
-        TODO("Not yet implemented")
+    override fun getGuilds(): List<Guild> = DBGuild().getGuildsForUser(getID().getValue()).toList()
+
+    @GraphQLIgnore
+    override fun getGuildByID(guildID: ID) : Guild? {
+        if (!checkUserInGuild(guildID)) return null
+        return DBGuild().getGuildByID(guildID.getValue())
+    }
+
+    @GraphQLIgnore
+    override fun getNonGuildChannelByID(channelID: ID): Channel? {
+        if (!DBChannel().getUserIDsForChannel(channelID.getValue()).contains(getID().getValue())) return null
+        return DBChannel().getChannelByID(channelID.getValue())
+    }
+
+    @GraphQLIgnore
+    override fun getGuildChannelByID(channelID: ID): GuildChannel? {
+        val guild : Guild  = DBGuild().getGuildByChannelID(channelID.getValue()) ?: throw ChannelNotFound()
+        if (checkUserInGuild(guild.getID())) return null
+        return DBChannel().getChannelByID(channelID.getValue()) as GuildChannel
     }
 
     @GraphQLIgnore
@@ -78,6 +94,23 @@ data class UserImpl(
     @GraphQLIgnore
     override fun changeProfilePictureLocation(profilePictureLocation: URI) {
         DBUser().updateProfilePictures(getID().getValue(), profilePictureLocation.toString())
+    }
+
+    @GraphQLIgnore
+    override fun createGuild(guild: Guild) {
+        val id = DBGuild().createGuildAndReturnID(
+            ownerID = getID().getValue(),
+            name = guild.getName(),
+            pictureLocation = guild.getIconLocation().toString()
+        )
+        DBGuild().addUserToGuild(
+            guildID = id,
+            userID = getID().getValue()
+        )
+    }
+
+    private fun checkUserInGuild(guildID: ID) : Boolean {
+        return DBGuild().getUserIDsForGuild(guildID.getValue()).contains(getID().getValue())
     }
 
 }

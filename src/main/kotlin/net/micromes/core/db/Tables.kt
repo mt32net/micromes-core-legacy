@@ -27,5 +27,19 @@ class Tables {
             val channel = reference("messagechannels", Channels)
             val sendTime = datetime("sendtime")
         }
+        object Guilds : LongIdTable() {
+            val name = varchar("name", 50)
+            val pictureLocation = varchar("picturelocation", 255)
+            val owner = reference("owner", Users)
+        }
+        object ChannelsByGuilds : Table() {
+            val channelID = reference("channel", Channels)
+            val guildID = reference("guild", Guilds)
+            val order = integer("order").autoIncrement().default(1)
+        }
+        object UsersByGuilds : Table() {
+            val user = reference("user", Users)
+            val guild = reference("guild", Guilds)
+        }
     }
 }

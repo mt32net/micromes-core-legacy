@@ -42,7 +42,7 @@ import net.micromes.core.graphql.Query
 data class Body(
     val query : String,
     val operationName: String?,
-    val variables: Map<String, String>
+    val variables: Map<String, String> = mapOf()
 )
 
 val publicKey = loadKey()

@@ -3,27 +3,32 @@ package net.micromes.core.db
 import net.micromes.core.db.Tables.Companion.Channels
 import net.micromes.core.db.Tables.Companion.UsersByChannels
 import net.micromes.core.entities.ID
-import net.micromes.core.entities.channels.MessageChannel
-import net.micromes.core.entities.channels.PrivateChannel
-import net.micromes.core.entities.channels.PrivateMessageChannel
-import net.micromes.core.entities.channels.PrivateMessageChannelImpl
+import net.micromes.core.entities.channels.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class DBChannel {
 
-    fun getMessageChannelByID(channelID : ID) : MessageChannel? {
-        var messageChannel : MessageChannel? = null
+    /**
+     * Return either content or message channels
+     */
+    fun getChannelByID(channelID : Long) : Channel? {
+        var channel : Channel? = null
         transaction {
-            Channels.select{ Channels.id eq channelID.getValue() }.forEach {
-                messageChannel = PrivateMessageChannelImpl(
-                    channelName = it[Channels.name],
-                    id = ID(it[Channels.id].value)
-                )
+            Channels.select{ Channels.id eq channelID }.forEach {
+                if (it[Channels.contentURL] == "false") {
+                    // TOD
+                    channel = MessageChannelImpl(
+                        name = it[Channels.name],
+                        id = ID(it[Channels.id].value)
+                    )
+                } else {
+                    TODO("content channels")
+                }
             }
         }
-        return messageChannel
+        return channel
     }
 
     fun createPrivateMessageChannel(name: String, usersIDs: Array<Long>) : PrivateMessageChannel {
@@ -45,17 +50,17 @@ class DBChannel {
         return PrivateMessageChannelImpl(id = ID(longID!!), channelName = name)
     }
 
-    fun getUsersIDsForChannel(channelID: ID) : Array<ID> {
-        val userIDs : MutableList<ID> = mutableListOf()
+    fun getUserIDsForChannel(channelID: Long) : List<Long> {
+        val channelIDs : MutableList<Long> = mutableListOf()
         transaction {
-            Tables.Companion.UsersByChannels.select { Tables.Companion.UsersByChannels.channel eq channelID.getValue() }.forEach {
-                userIDs.add(ID(it[Tables.Companion.UsersByChannels.user].value))
+            Tables.Companion.UsersByChannels.select { Tables.Companion.UsersByChannels.channel eq channelID }.forEach {
+                channelIDs.add(it[UsersByChannels.user].value)
             }
         }
-        return userIDs.toTypedArray()
+        return channelIDs
     }
 
-    fun getPrivateChannelsForUserID(userID: Long) : List<PrivateChannel> {
+    fun getChannelsForUserID(userID: Long) : List<Channel> {
         val channels = mutableListOf<PrivateChannel>()
         transaction {
             //val channelIDs = mutableListOf<Long>()

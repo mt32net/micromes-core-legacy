@@ -14,7 +14,10 @@ fun dBInit() {
             Tables.Companion.UsersByChannels,
             Tables.Companion.Channels,
             Tables.Companion.Messages,
-            Tables.Companion.Users
+            Tables.Companion.Users,
+            Tables.Companion.Guilds,
+            Tables.Companion.ChannelsByGuilds,
+            Tables.Companion.UsersByGuilds
         )
     }
 }

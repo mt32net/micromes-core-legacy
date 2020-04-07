@@ -4,6 +4,7 @@ import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.entities.Entity
 import net.micromes.core.entities.channels.Channel
+import net.micromes.core.entities.channels.GuildChannel
 import java.net.URI
 import java.util.*
 
@@ -13,11 +14,14 @@ interface Guild : Entity {
     fun getName() : String
 
     @GraphQLName("channels")
-    fun getChannels() : Array<Channel>
+    fun getChannels() : Array<GuildChannel>
 
     @GraphQLIgnore
-    fun createChannel(name: String, uuid: UUID)
+    fun createChannel(channel: GuildChannel)
+
+    @GraphQLIgnore
+    fun getIconLocation() : URI
 
     @GraphQLName("iconLocation")
-    fun getIconLocation() : URI
+    fun getIconLocationAsString() : String = getIconLocation().toString()
 }

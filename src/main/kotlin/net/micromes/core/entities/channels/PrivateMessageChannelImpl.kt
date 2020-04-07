@@ -2,6 +2,7 @@ package net.micromes.core.entities.channels
 
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
+import net.micromes.core.db.DBChannel
 import net.micromes.core.entities.ID
 import net.micromes.core.entities.user.UserImpl
 
@@ -28,6 +29,6 @@ class PrivateMessageChannelImpl(
 
     @GraphQLIgnore
     override fun addUser(user: UserImpl) {
-        TODO("Not yet implemented")
+        DBChannel().addUserToChannel(user.getID().getValue(), getID().getValue())
     }
 }

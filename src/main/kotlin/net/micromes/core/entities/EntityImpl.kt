@@ -1,7 +1,7 @@
 package net.micromes.core.entities
 
 import com.expediagroup.graphql.annotations.GraphQLIgnore
-import net.micromes.core.exceptions.NoIDYetError
+import net.micromes.core.exceptions.NotWrittenYet
 
 abstract class EntityImpl(
     @GraphQLIgnore
@@ -9,5 +9,5 @@ abstract class EntityImpl(
 ) : Entity {
 
     @GraphQLIgnore
-    override fun getID(): ID = id ?: throw NoIDYetError()
+    override fun getID(): ID = id ?: throw NotWrittenYet()
 }

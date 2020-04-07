@@ -2,12 +2,10 @@ package net.micromes.core.entities.user
 
 import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
+import net.micromes.core.db.DBChannel
 import net.micromes.core.entities.Entity
 import net.micromes.core.entities.ID
-import net.micromes.core.entities.channels.Channel
-import net.micromes.core.entities.channels.PrivateChannel
-import net.micromes.core.entities.channels.PrivateMessageChannel
-import net.micromes.core.entities.channels.PublicChannel
+import net.micromes.core.entities.channels.*
 import net.micromes.core.entities.guild.Guild
 import java.net.URI
 
@@ -25,9 +23,6 @@ interface User : Entity {
     @GraphQLName("profilePictureLocation")
     fun getProfilePictureURIAsString() : String = getProfilePictureLocation().toASCIIString()
 
-    /**
-     * Returns all private and public channels as well as guild channels the user has access to
-     */
     @GraphQLIgnore
     fun getAllChannels() : List<Channel>
 
@@ -41,6 +36,15 @@ interface User : Entity {
     fun getGuilds() : List<Guild>
 
     @GraphQLIgnore
+    fun getGuildByID(guildID: ID) : Guild?
+
+    @GraphQLIgnore
+    fun getNonGuildChannelByID(channelID: ID) : Channel?
+
+    @GraphQLIgnore
+    fun getGuildChannelByID(channelID: ID) : GuildChannel?
+
+    @GraphQLIgnore
     fun changeName(name: String)
 
     @GraphQLIgnore
@@ -51,4 +55,7 @@ interface User : Entity {
 
     @GraphQLIgnore
     fun changeProfilePictureLocation(profilePictureLocation: URI)
+
+    @GraphQLIgnore
+    fun createGuild(guild: Guild)
 }
