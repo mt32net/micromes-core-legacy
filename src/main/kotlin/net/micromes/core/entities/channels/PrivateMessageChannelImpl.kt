@@ -4,6 +4,7 @@ import com.expediagroup.graphql.annotations.GraphQLIgnore
 import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.db.DBChannel
 import net.micromes.core.entities.ID
+import net.micromes.core.entities.user.User
 import net.micromes.core.entities.user.UserImpl
 
 class PrivateMessageChannelImpl(
@@ -15,17 +16,13 @@ class PrivateMessageChannelImpl(
 ) {
 
     @GraphQLName("users")
-    override fun getUsers(): Array<UserImpl> {
-        TODO("Not yet implemented")
-    }
+    override fun getUsers(): Array<User> = DBChannel().getUsersForChannel(getID().getValue()).toTypedArray()
 
     @GraphQLIgnore
-    fun getUserIDs() : Array<ID> {
-        TODO("Not yet")
-    }
+    fun getUserIDs() : Array<ID> = DBChannel().getUserIDsForChannel(getID().getValue()).map { id -> ID(id) }.toTypedArray()
 
     @GraphQLName("userIDs")
-    fun getUserStringIDs() : List<String> = getUserIDs().map { uuid -> uuid.toString() }
+    override fun getUserStringIDs() : List<String> = getUserIDs().map { uuid -> uuid.toString() }
 
     @GraphQLIgnore
     override fun addUser(user: UserImpl) {

@@ -4,9 +4,13 @@ import net.micromes.core.db.Tables.Companion.Channels
 import net.micromes.core.db.Tables.Companion.UsersByChannels
 import net.micromes.core.entities.ID
 import net.micromes.core.entities.channels.*
+import net.micromes.core.entities.user.Status
+import net.micromes.core.entities.user.User
+import net.micromes.core.entities.user.UserDataImpl
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.net.URI
 
 class DBChannel {
 
@@ -29,6 +33,25 @@ class DBChannel {
             }
         }
         return channel
+    }
+
+    fun getUsersForChannel(channelID: Long) : List<User> {
+        val users: MutableList<User> = mutableListOf()
+        getUserIDsForChannel(channelID).forEach {
+            transaction {
+                Tables.Companion.Users.select { Tables.Companion.Users.id eq it }.forEach { us ->
+                    users.add(
+                        UserDataImpl(
+                            name = us[Tables.Companion.Users.name],
+                            profilePictureLocation = URI.create(us[Tables.Companion.Users.profilePictureLocation]),
+                            status = Status.ONLINE,
+                            id = ID(it)
+                        )
+                    )
+                }
+            }
+        }
+        return users
     }
 
     fun createPrivateMessageChannel(name: String, usersIDs: Array<Long>) : PrivateMessageChannel {
