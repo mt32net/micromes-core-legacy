@@ -47,7 +47,7 @@ class Mutation {
     }
 
     fun createGuild(context: Context, name: String) : Boolean {
-        context.getUser().createGuild(GuildImpl(name = name, iconLocation = Settings.STANDARD_GUILD_ICON, id = null))
+        context.getUser().createGuild(GuildImpl(name = name, iconLocation = Settings.STANDARD_GUILD_ICON, id = null, ownerID = null))
         return true
     }
 

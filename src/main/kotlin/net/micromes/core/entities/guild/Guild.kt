@@ -5,6 +5,7 @@ import com.expediagroup.graphql.annotations.GraphQLName
 import net.micromes.core.entities.Entity
 import net.micromes.core.entities.channels.Channel
 import net.micromes.core.entities.channels.GuildChannel
+import net.micromes.core.entities.user.User
 import java.net.URI
 import java.util.*
 
@@ -24,4 +25,16 @@ interface Guild : Entity {
 
     @GraphQLName("iconLocation")
     fun getIconLocationAsString() : String = getIconLocation().toString()
+
+    @GraphQLName("owner")
+    fun getOwner() : User
+
+    @GraphQLName("ownerID")
+    fun getOwnerIDAsString() : String
+
+    @GraphQLName("users")
+    fun getUsers() : List<User>
+
+    @GraphQLName("userIDs")
+    fun getUserStringIDs() : List<String>
 }

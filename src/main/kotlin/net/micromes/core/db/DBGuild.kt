@@ -8,6 +8,9 @@ import net.micromes.core.db.Tables.Companion.ChannelsByGuilds
 import net.micromes.core.entities.ID
 import net.micromes.core.entities.channels.GuildMessageChannelImpl
 import net.micromes.core.entities.guild.GuildImpl
+import net.micromes.core.entities.user.Status
+import net.micromes.core.entities.user.User
+import net.micromes.core.entities.user.UserDataImpl
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -79,7 +82,8 @@ class DBGuild {
                 guild = GuildImpl(
                     id = ID(guildID),
                     name = it[Guilds.name],
-                    iconLocation = URI.create(it[Guilds.pictureLocation])
+                    iconLocation = URI.create(it[Guilds.pictureLocation]),
+                    ownerID = ID(it[Guilds.owner].value)
                 )
             }
         }
@@ -104,6 +108,25 @@ class DBGuild {
             }
         }
         return ids
+    }
+
+    fun getUsersForGuild(guildID: Long) : List<User> {
+        val users : MutableList<User> = mutableListOf()
+        getUserIDsForGuild(guildID).forEach {
+            transaction {
+                Tables.Companion.Users.select { Tables.Companion.Users.id eq it }.forEach { us ->
+                    users.add(
+                        UserDataImpl(
+                            name = us[Tables.Companion.Users.name],
+                            profilePictureLocation = URI.create(us[Tables.Companion.Users.profilePictureLocation]),
+                            status = Status.ONLINE,
+                            id = ID(it)
+                        )
+                    )
+                }
+            }
+        }
+        return users
     }
 
     fun addUserToGuild(guildID: Long, userID: Long) {
