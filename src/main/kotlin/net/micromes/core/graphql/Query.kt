@@ -13,6 +13,7 @@ class Query {
     fun me(context: Context) : User = context.getUser()
     fun privateChannels(context: Context) : List<PrivateChannel> = context.getUser().getPrivateChannels()
     fun guilds(context: Context) : List<Guild> = context.getUser().getGuilds()
+    fun getGuildByID(context: Context, guildID: String) = context.getUser().getGuildByID(guildID = ID(guildID))
 
     fun messagesForNonGuildChannel(context: Context, channelID: String) : Array<Message> {
         val channel = context.getUser().getNonGuildChannelByID(channelID = ID(channelID))
