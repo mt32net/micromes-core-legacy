@@ -1,10 +1,10 @@
 package net.micromes.core.entities.channels
 
-import net.micromes.core.entities.message.ContentImpl
+import com.expediagroup.graphql.annotations.GraphQLName
+import net.micromes.core.entities.message.Content
 
 interface ContentChannel: Channel {
 
-    fun getContent() : ContentImpl
-
-    fun setContent(content: ContentImpl)
+    @GraphQLName("content")
+    fun getContent() : Content
 }

@@ -19,7 +19,7 @@ class Tables {
         object Channels : LongIdTable() {
             val name = varchar("name", 20)
             val public = bool("public").default(false)
-            val contentURL = varchar("content", 255)
+            val content = reference("content", Contents).nullable()
         }
         object Messages : LongIdTable() {
             val content = varchar("content", 1999)
@@ -33,13 +33,17 @@ class Tables {
             val owner = reference("owner", Users)
         }
         object ChannelsByGuilds : Table() {
-            val channelID = reference("channel", Channels)
+            val channelID = reference("channel", Channels).uniqueIndex()
             val guildID = reference("guild", Guilds)
-            val order = integer("order").autoIncrement().default(1)
+            val order = integer("order").default(10)
         }
         object UsersByGuilds : Table() {
             val user = reference("user", Users)
             val guild = reference("guild", Guilds)
+        }
+        object Contents : LongIdTable() {
+            val contentURL = varchar("contenturl", 255)
+            val lastUpdated = datetime("update")
         }
     }
 }

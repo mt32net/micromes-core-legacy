@@ -12,8 +12,13 @@ class PrivateMessageChannelImpl(
     private val channelName : String
 ) : PrivateMessageChannel, MessageChannelImpl(
     id = id,
-    name = channelName
+    channelName = channelName
 ) {
+
+    constructor(channel: Channel) : this(
+        id = channel.getID(),
+        channelName = channel.getName()
+    )
 
     @GraphQLName("users")
     override fun getUsers(): Array<User> = DBChannel().getUsersForChannel(getID().getValue()).toTypedArray()

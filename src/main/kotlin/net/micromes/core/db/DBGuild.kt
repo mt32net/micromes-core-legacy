@@ -35,7 +35,7 @@ class DBGuild {
         transaction {
             id = Tables.Companion.Channels.insertAndGetId {
                 it[Tables.Companion.Channels.name] = name
-                it[Tables.Companion.Channels.contentURL] = contentURL
+                it[Tables.Companion.Channels.content] = null
                 it[Tables.Companion.Channels.public] = false
             }.value
         }
@@ -53,7 +53,7 @@ class DBGuild {
         transaction {
             ChannelsByGuilds.select { ChannelsByGuilds.guildID eq guildID }.forEach { i ->
                 Tables.Companion.Channels.select { Tables.Companion.Channels.id eq i[ChannelsByGuilds.channelID] }.forEach { j->
-                    if (j[Tables.Companion.Channels.contentURL] == "false") channels.add(
+                    if (j[Tables.Companion.Channels.content] == null) channels.add(
                         GuildMessageChannelImpl(
                             id = ID(j[Tables.Companion.Channels.id].value),
                             channelName = j[Tables.Companion.Channels.name]

@@ -11,7 +11,7 @@ open class GuildMessageChannelImpl(
     private val channelName: String
 ) : GuildChannel, MessageChannelImpl(
     id = id,
-    name = channelName
+    channelName = channelName
 ) {
     @GraphQLIgnore
     override fun getGuild(): Guild = DBGuild().getGuildByChannelID(getID().getValue()) ?: throw DBEntityNotFoundError()

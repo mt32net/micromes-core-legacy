@@ -7,6 +7,7 @@ import net.micromes.core.entities.channels.*
 import net.micromes.core.entities.user.Status
 import net.micromes.core.entities.user.User
 import net.micromes.core.entities.user.UserDataImpl
+import net.micromes.core.exceptions.DBEntityNotFoundError
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -14,21 +15,29 @@ import java.net.URI
 
 class DBChannel {
 
-    /**
-     * Return either content or message channels
-     */
     fun getChannelByID(channelID : Long) : Channel? {
         var channel : Channel? = null
         transaction {
             Channels.select{ Channels.id eq channelID }.forEach {
-                if (it[Channels.contentURL] == "false") {
-                    // TOD
-                    channel = MessageChannelImpl(
-                        name = it[Channels.name],
-                        id = ID(it[Channels.id].value)
-                    )
+                if (it[Channels.content] == null) {
+                    if (it[Channels.public]) {
+                        // Public message channel
+                    } else {
+                        channel = MessageChannelImpl(
+                            channelName = it[Channels.name],
+                            id = ID(it[Channels.id].value)
+                        )
+                    }
                 } else {
-                    TODO("content channels")
+                    if (it[Channels.public]) {
+                        // Public message channel
+                    } else {
+                        channel = ContentChannelImpl(
+                            channelName = it[Channels.name],
+                            id = ID(it[Channels.id].value),
+                            content = DBMessage().getContentByID(it[Channels.content]!!.value) ?: throw DBEntityNotFoundError()
+                        )
+                    }
                 }
             }
         }
@@ -61,7 +70,7 @@ class DBChannel {
             longID = Channels.insertAndGetId {
                 it[Channels.name] = name
                 it[Channels.public] = false
-                it[Channels.contentURL] = "false"
+                it[Channels.content] = null
             }.value
             usersIDs.forEach { userID ->
                 Tables.Companion.UsersByChannels.insert {
@@ -86,15 +95,8 @@ class DBChannel {
     fun getChannelsForUserID(userID: Long) : List<Channel> {
         val channels = mutableListOf<PrivateChannel>()
         transaction {
-            //val channelIDs = mutableListOf<Long>()
-            addLogger(StdOutSqlLogger)
-            UsersByChannels.select { UsersByChannels.user eq userID }.forEach { chByUser ->
-                Channels.select { Channels.id eq chByUser[UsersByChannels.channel].value }.forEach { ch ->
-                    if (ch[Channels.contentURL] == "false") channels.add(PrivateMessageChannelImpl(
-                        channelName = ch[Channels.name],
-                        id = ID(ch[Channels.id].value)
-                    ))
-                }
+            UsersByChannels.select { UsersByChannels.user eq userID }.forEach {
+                val channel: Channel = getChannelByID(it[UsersByChannels.channel].value) ?: throw DBEntityNotFoundError()
             }
         }
         return channels
