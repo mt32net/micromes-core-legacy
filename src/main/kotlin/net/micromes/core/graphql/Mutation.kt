@@ -25,7 +25,7 @@ class Mutation {
     }
 
     fun sendMessage(context: Context, channelID: String, content: String) : Boolean {
-        val channel = context.getUser().getChannelByID(ID(channelID))
+        val channel : Channel = context.getUser().getChannelByID(ID(channelID)) ?: throw ChannelNotFound()
         if (channel is MessageChannel) channel.sendMessage(MessageImpl(
             id = null,
             content = content,

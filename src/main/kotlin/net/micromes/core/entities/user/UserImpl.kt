@@ -63,7 +63,9 @@ open class UserImpl(
 
     @GraphQLIgnore
     override fun getChannelByID(channelID: ID): Channel? {
-        return (getNonGuildChannelByID(channelID) ?: getGuildChannelByID(channelID))
+        val c = getNonGuildChannelByID(channelID)
+        return if (c == null) getGuildChannelByID(channelID)
+        else c
     }
 
     @GraphQLIgnore
@@ -75,8 +77,10 @@ open class UserImpl(
     @GraphQLIgnore
     override fun getGuildChannelByID(channelID: ID): GuildChannel? {
         val guild : Guild  = DBGuild().getGuildByChannelID(channelID.getValue()) ?: throw ChannelNotFound()
-        if (checkUserInGuild(guild.getID())) return null
-        return DBChannel().getChannelByID(channelID.getValue()) as GuildChannel
+        if (!checkUserInGuild(guild.getID())) return null
+        val channel = DBChannel().getChannelByID(channelID.getValue())
+        return if (channel is MessageChannel) GuildMessageChannelImpl(channel)
+        else null
     }
 
     @GraphQLIgnore

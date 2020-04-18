@@ -13,6 +13,9 @@ open class GuildMessageChannelImpl(
     id = id,
     channelName = channelName
 ) {
+
+    constructor(channel: Channel) : this(channel.getID(), channel.getName())
+
     @GraphQLIgnore
     override fun getGuild(): Guild = DBGuild().getGuildByChannelID(getID().getValue()) ?: throw DBEntityNotFoundError()
 }
