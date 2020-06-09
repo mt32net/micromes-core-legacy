@@ -2,9 +2,6 @@
 
 Open Messenger, simple structure and advanced functionality (not yet) 
 
-We try to create an alternative to closed source messeging services like Discord or Slack. A messenger everyone can usse and
-everyone can customize
-
 ## Contribute
 
 If you want to contrubute just open a Pull Request or an issue. There are no generell instructions, because there is not a lot working yet and things change quickly. There is also no Build section
